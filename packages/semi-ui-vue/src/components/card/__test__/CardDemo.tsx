@@ -2,7 +2,8 @@ import {defineComponent, ref, h, Fragment, useSlots, watch, computed} from 'vue'
 import CardGroup from "../cardGroup";
 import Slider from "../../slider";
 import Card from "../index";
-import {TypographyText} from "../../index";
+import { TypographyText } from '../../typography';
+
 
 interface CardDemoProps {
   name?: string
@@ -11,7 +12,7 @@ interface CardDemoProps {
 export const vuePropsType = {
   name: String
 }
-const CardDemo = defineComponent<CardDemoProps>((props, {}) => {
+const CardDemo = defineComponent((props, {}) => {
   const slots = useSlots()
 
   const spacing = ref(12);

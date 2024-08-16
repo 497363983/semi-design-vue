@@ -9,7 +9,7 @@ interface OptionDemoProps {
 export const vuePropsType = {
   name: String,
 };
-const OptionDemo = defineComponent<OptionDemoProps>((props, {}) => {
+const OptionDemo = defineComponent((props, {}) => {
   const slots = useSlots();
 
   const option = { key: '16753935370932', label: 's@qq.com', show: true, value: 's@qq.com' };
@@ -26,7 +26,9 @@ const OptionDemo = defineComponent<OptionDemoProps>((props, {}) => {
   </div>)
 });
 
+//@ts-ignore
 OptionDemo.props = vuePropsType;
+//@ts-ignore
 OptionDemo.name = "OptionDemo";
 
 export default OptionDemo;

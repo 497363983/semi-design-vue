@@ -5,7 +5,7 @@ import {CheckboxContext} from "../context";
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:CheckboxContext}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = ref<CheckboxContext>(props.value);
 
   watch(()=>props.value, ()=>{
@@ -14,7 +14,7 @@ const Provider = defineComponent<{value:CheckboxContext}>((props, {slots}) => {
   provide('CheckboxContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'CheckboxContextProvider'
 })
 

@@ -1,8 +1,10 @@
 import {defineComponent, ref, h, Fragment, useSlots} from 'vue'
-import {Button} from "../../index";
+
 import SideSheet from "../index";
 import RadioGroup from "../../radio/radioGroup";
-import {Radio} from "../../radio";
+import Radio from '../../radio/radio';
+import Button from '../../button';
+
 
 interface SideSheetDemoProps {
   name?: string
@@ -11,7 +13,7 @@ interface SideSheetDemoProps {
 export const vuePropsType = {
   name: String
 }
-const SideSheetDemo = defineComponent<SideSheetDemoProps>((props, {}) => {
+const SideSheetDemo = defineComponent((props, {}) => {
   const slots = useSlots()
 
   const visible = ref(false);
@@ -40,7 +42,13 @@ const SideSheetDemo = defineComponent<SideSheetDemoProps>((props, {}) => {
       </RadioGroup>
       <br />
       <br />
-      <Button onClick={change}>Open SideSheet</Button>
+      <Button
+        //@ts-ignore
+        role={'bt1'}
+        onClick={change}
+      >
+        Open SideSheet
+      </Button>
       <SideSheet title="滑动侧边栏" visible={visible.value} onCancel={change} placement={placement.value}
                  mask={false}
                  disableScroll={false}
@@ -62,25 +70,32 @@ const SideSheetDemo = defineComponent<SideSheetDemoProps>((props, {}) => {
         }}
         class="sidesheet-container"
       >
-        <span>Render in this</span>
-        <br />
-        <br />
-        <Button onClick={() => visible2.value = true}>Open SideSheet</Button>
-        <SideSheet
-          title="渲染在指定容器内部"
-          visible={visible2.value}
-          onCancel={() => visible2.value = false}
-          width={220}
-          getPopupContainer={getContainer}
-        >
-          <p>This is the content of a basic sidesheet.</p>
-          <p>Here is more content...</p>
-        </SideSheet>
+        <div>
+          <span>Render in this</span>
+          <br />
+          <br />
+          <Button
+            onClick={() => visible2.value = true}
+            //@ts-ignore
+            role={'bt2'}
+          >
+            Open SideSheet
+          </Button>
+          <SideSheet
+            title="渲染在指定容器内部"
+            visible={visible2.value}
+            onCancel={() => visible2.value = false}
+            width={220}
+            getPopupContainer={getContainer}
+          >
+            <p>This is the content of a basic sidesheet.</p>
+            <p>Here is more content...</p>
+          </SideSheet>
+        </div>
       </div>
     </div>
   )
 })
-
 
 
 export default SideSheetDemo

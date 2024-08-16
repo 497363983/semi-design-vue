@@ -1,13 +1,7 @@
-import { defineComponent, ref, h, Fragment, useSlots, computed, onMounted } from 'vue';
-import Table, {ColumnProps, RowSelection, TableColumn} from '../index';
+import { defineComponent } from 'vue';
+import Table from '../index';
 import Avatar from '../../avatar';
-import { IconMore } from '@kousum/semi-icons-vue';
-import { IllustrationNoResult, IllustrationNoResultDark } from '@kousum/semi-illustrations-vue';
-import { Button, Empty } from '../../index';
-import { IconDelete } from '@kousum/semi-icons-vue';
-import { TypographyText } from '../../typography';
 import * as dateFns from 'date-fns';
-import Tag from "../../tag";
 
 interface TableDemo1Props {
   name?: string;
@@ -95,7 +89,7 @@ const data = getData();
 export const vuePropsType = {
   name: String,
 };
-const TableDemo1 = defineComponent<TableDemo1Props>((props, {}) => {
+const TableDemo1 = defineComponent((props, {}) => {
 
   return () => {
     const rowKey = record =>

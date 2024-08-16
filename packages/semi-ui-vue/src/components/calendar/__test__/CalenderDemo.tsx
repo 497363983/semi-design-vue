@@ -9,7 +9,7 @@ interface CalenderDemoProps {
 export const vuePropsType = {
   name: String
 }
-const CalenderDemo = defineComponent<CalenderDemoProps>((props, {}) => {
+const CalenderDemo = defineComponent((props, {}) => {
   const slots = useSlots()
 
   const DemoDiy = () => {
@@ -36,12 +36,13 @@ const CalenderDemo = defineComponent<CalenderDemoProps>((props, {}) => {
       <Calendar mode="day"></Calendar>
       <Calendar mode="week"></Calendar>
       <Calendar mode="month"></Calendar>
-      <EventDemo/>
+      <Calendar mode="range" range={[new Date(2020, 8, 26), new Date(2020, 8, 31)]}></Calendar>
+      <EventDemo name={''}/>
       <DemoDiy />
     </div>
   )
 }, {
-  props:vuePropsType,
+  props: { ...vuePropsType },
   name:'CalenderDemo',
 })
 

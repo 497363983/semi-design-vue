@@ -1,40 +1,37 @@
-import {defineComponent, ref, h, Fragment, CSSProperties, Ref, ComponentObjectPropsOptions, PropType} from 'vue'
+import { defineComponent, ref, h, Fragment, CSSProperties, Ref, ComponentObjectPropsOptions, PropType } from 'vue';
 import cls from 'classnames';
 import { cssClasses } from '@douyinfe/semi-foundation/typography/constants';
 import '@douyinfe/semi-foundation/typography/typography.scss';
 import { BaseProps } from '../_base/baseComponent';
+import { CombineProps } from '../interface';
 const prefixCls = cssClasses.PREFIX;
-interface TypographyProps extends BaseProps{
+interface TypographyProps extends BaseProps {
   component_?: any;
   forwardRef?: Ref<any>;
-  style?: CSSProperties
-  className?: string
+  style?: CSSProperties;
+  className?: string;
 }
 
-export const vuePropsType:ComponentObjectPropsOptions<TypographyProps> = {
+export const vuePropsType: CombineProps<TypographyProps> = {
   component_: {
-    type: [String, Array, Boolean, Object,Number] as PropType<TypographyProps['component_']>,
-    default: 'article'
+    type: [String, Array, Boolean, Object, Number] as PropType<TypographyProps['component_']>,
+    default: 'article',
   },
   style: [String, Object] as PropType<TypographyProps['style']>,
   className: String,
   forwardRef: Object,
-}
-const Typography = defineComponent<TypographyProps>((props, {slots}) => {
+};
+const Typography = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Typography',
+  setup(props, { slots }) {
+    return () => {
+      const { component_, className, forwardRef, ...rest } = props;
+      const classNames = cls(prefixCls, className);
+      const children = slots.default ? slots.default() : null;
+      return h(component_, { class: classNames, ref: forwardRef, ...rest }, children);
+    };
+  },
+});
 
-
-  const { component_, className, forwardRef, ...rest } = props;
-  const classNames = cls(prefixCls, className);
-  // console.debug(component_,{class:classNames,ref:forwardRef,...rest})
-  return ()=>{
-    const children = slots.default?slots.default():null
-    return h(component_, {class:classNames,ref:forwardRef,...rest}, children)
-  };
-}, {
-  props: vuePropsType,
-  name: 'Typography'
-})
-
-
-export default Typography
-
+export default Typography;

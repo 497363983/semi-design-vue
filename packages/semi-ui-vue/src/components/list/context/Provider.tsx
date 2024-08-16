@@ -5,7 +5,7 @@ import {ListContextValue} from "../list-context";
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:ListContextValue}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = ref<ListContextValue>();
 
   watch(()=>props.value, ()=>{
@@ -14,7 +14,7 @@ const Provider = defineComponent<{value:ListContextValue}>((props, {slots}) => {
   provide('ListContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'ListContextProvider'
 })
 

@@ -8,6 +8,26 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // 没用
+    // deps: {
+    //   // >= 0.34
+    //   optimizer: {
+    //     web: {
+    //       include: ['vitest-canvas-mock']
+    //     }
+    //   }
+    // },
+    // >= 0.1.0
+    // poolOptions: {
+    //   forks: {
+    //     singleFork: true,
+    //   },
+    // },
+    // environmentOptions: {
+    //   jsdom: {
+    //     resources: 'usable',
+    //   },
+    // },
     coverage: {
       provider: "v8",
       exclude:[
@@ -36,6 +56,10 @@ export default defineConfig({
         "**/__tests__/**",
         "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
         "**/.{eslint,mocha,prettier}rc.{js,cjs,yml}",
+        "**/*.cjs",
+        "**/vite-plugin-semi-theme/**",
+        "**/main.ts",
+        "**/App.tsx"
       ]
     },
   },

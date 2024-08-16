@@ -72,7 +72,7 @@ export { default as TreeSelect } from './treeSelect/index';
 export { Link } from './anchor';
 export { Link as AnchorLink } from './anchor';
 export { default as Anchor } from './anchor';
-export { default as AutoComplete } from './autoComplete';
+export { default as AutoComplete, AutoCompleteFunc } from './autoComplete';
 export { default as AvatarGroup } from './avatar/avatarGroup';
 export { default as BackTop } from './backtop';
 export { default as Badge } from './badge';
@@ -92,6 +92,8 @@ export { ListItem } from './list';
 export { default as InputGroup } from './input/inputGroup';
 export { default as Nav } from './navigation/index';
 export { default as NavItem } from './navigation/Item';
+export { default as NavHeader } from './navigation/Header';
+export { default as NavFooter } from './navigation/Footer';
 export { default as SubNav } from './navigation/SubNav';
 export type {
   NavFooterProps,
@@ -112,23 +114,30 @@ export { default as Pagination } from './pagination';
 export { default as Popconfirm } from './popconfirm';
 export { default as ScrollItem } from './scrollList/scrollItem';
 export { default as SideSheet } from './sideSheet';
-export { default as Skeleton } from './skeleton';
+export {
+  default as Skeleton,
+  SkeletonAvatar,
+  SkeletonImage,
+  SkeletonTitle,
+  SkeletonButton,
+  SkeletonParagraph
+} from './skeleton';
 
 export { default as Step } from './steps/step';
-export { default as Steps } from './steps';
+export { default as Steps, StepsStep } from './steps';
 export { default as Switch } from './switch';
 
 /**
  * Table
  */
 export { default as Table, TableMaker } from './table';
-export type { ColumnProps, TablePaginationProps, Align, Data as TableColumnData } from './table/interface';
+export type { ColumnProps, TablePaginationProps, Align, Data as TableColumnData, RowSelection, OnRow } from './table/interface';
 export type { TableStateRowSelection } from './table/Table';
 
 export { default as Tabs } from './tabs';
 export { default as TabPane } from './tabs/TabPane';
 export { default as TagGroup } from './tag/group';
-export { default as Timeline } from './timeline';
+export { default as Timeline, TimelineItem } from './timeline';
 export { default as Toast, ToastFactory } from './toast';
 export { default as Transfer } from './transfer';
 export type {
@@ -166,7 +175,7 @@ export {
   FormTimePicker,
   FormTreeSelect,
   FormUpload,
-  Form,
+  default as Form,
   ArrayField,
   withField,
   useFormApi,
@@ -201,3 +210,10 @@ export {
   UploadVModel,
 } from './withVModel/index';
 export { default as WithVModel } from './withVModel/WithVModel';
+
+export {default as PinCode} from './pincode'
+export {default as Lottie} from './lottie'
+export {default as CodeHighlight} from './codeHighlight'
+export {default as MarkdownRender} from './markdownRender'
+
+export { default as Chat } from './chat';

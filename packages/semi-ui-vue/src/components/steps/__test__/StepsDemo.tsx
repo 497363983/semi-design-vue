@@ -9,7 +9,7 @@ interface StepsDemoProps {
 export const vuePropsType = {
   name: String
 }
-const StepsDemo = defineComponent<StepsDemoProps>((props, {}) => {
+const StepsDemo = defineComponent((props, {}) => {
   const slots = useSlots()
 
   function onChange(v) {
@@ -39,7 +39,7 @@ const StepsDemo = defineComponent<StepsDemoProps>((props, {}) => {
     </div>
   )
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name:'StepsDemo'
 })
 

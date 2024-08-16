@@ -1,5 +1,6 @@
 import {defineComponent, ref, h, Fragment, useSlots} from 'vue'
-import {Button, Form, FormInput, withFormState} from "../../index";
+import { Form, FormInput, withFormState } from '../index';
+
 
 const SomeComponentInsideForm = props => (
   <code>{JSON.stringify(props.formState.value)}</code>
@@ -13,7 +14,7 @@ interface WithFormStateDemoProps {
 export const vuePropsType = {
   name: String
 }
-const WithFormStateDemo = defineComponent<WithFormStateDemoProps>((props, {}) => {
+const WithFormStateDemo = defineComponent((props, {}) => {
 
   const slots = useSlots()
 

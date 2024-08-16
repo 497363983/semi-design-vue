@@ -4,7 +4,7 @@ import { cssClasses } from '@douyinfe/semi-foundation/tabs/constants';
 import { IconClose } from '@kousum/semi-icons-vue';
 import { TabType, TabSize, TabPosition } from './interface';
 import { ComponentObjectPropsOptions, computed, defineComponent, h, PropType, useSlots } from 'vue';
-import { VueJsxNode } from '../interface';
+import { CombineProps, VueJsxNode } from '../interface';
 import { vuePropsMake } from '../PropTypes';
 
 export interface TabItemProps {
@@ -22,7 +22,7 @@ export interface TabItemProps {
   onClick?: (itemKey: string, e: MouseEvent) => void;
   forwardRef?: any;
 }
-const propTypes: ComponentObjectPropsOptions<TabItemProps> = {
+const propTypes: CombineProps<TabItemProps> = {
   tab: PropTypes.node,
   icon: PropTypes.node,
   size: PropTypes.string as PropType<TabItemProps['size']>,
@@ -38,8 +38,10 @@ const propTypes: ComponentObjectPropsOptions<TabItemProps> = {
   forwardRef: [PropTypes.object, PropTypes.func],
 };
 export const vuePropsType = vuePropsMake(propTypes, {});
-const TabItem = defineComponent<TabItemProps>(
-  (props, {attrs}) => {
+const TabItem = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Tabs.TabItem',
+  setup(props, { attrs }) {
     const slots = useSlots();
 
     const closableIcon = computed(() => {
@@ -115,10 +117,6 @@ const TabItem = defineComponent<TabItemProps>(
       );
     };
   },
-  {
-    props: vuePropsType,
-    name: 'Tabs.TabItem',
-  }
-);
+});
 
 export default TabItem;

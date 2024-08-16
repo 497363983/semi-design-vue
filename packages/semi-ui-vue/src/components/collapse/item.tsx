@@ -4,17 +4,27 @@ import { cssClasses } from '@douyinfe/semi-foundation/collapse/constants';
 import Collapsible from '../collapsible';
 import { IconChevronDown, IconChevronUp } from '@kousum/semi-icons-vue';
 import { getUuidShort } from '@douyinfe/semi-foundation/utils/uuid';
-import { CSSProperties, defineComponent, Fragment, h, onMounted, ref, useSlots, VNode } from 'vue';
+import {
+  ComponentObjectPropsOptions,
+  CSSProperties,
+  defineComponent,
+  Fragment,
+  h,
+  onMounted, PropType,
+  ref,
+  useSlots,
+  VNode,
+} from 'vue';
 import { useCollapseContext } from './context/Consumer';
 import { vuePropsMake } from '../PropTypes';
-import { VueJsxNode } from '../interface';
+import { CombineProps, VueJsxNode } from '../interface';
 
 export interface CollapsePanelProps {
   itemKey: string;
   extra?: VueJsxNode;
   header?: VueJsxNode;
   className?: string;
-  children?: VNode[];
+  // children?: VNode[];
   reCalcKey?: number | string;
   style?: CSSProperties;
   showArrow?: boolean;
@@ -22,14 +32,19 @@ export interface CollapsePanelProps {
   onMotionEnd?: () => void;
 }
 
-const propTypes = {
-  itemKey: PropTypes.string,
+const propTypes: CombineProps<CollapsePanelProps> = {
+  itemKey: {
+    type: PropTypes.string,
+    required: true
+  },
   extra: PropTypes.node,
   header: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   className: PropTypes.string,
   reCalcKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showArrow: PropTypes.bool,
   disabled: PropTypes.bool,
+  style: PropTypes.object,
+  onMotionEnd: PropTypes.func as PropType<CollapsePanelProps['onMotionEnd']>,
 };
 
 const defaultProps = {
@@ -37,9 +52,11 @@ const defaultProps = {
   disabled: false,
 };
 
-export const vuePropsType = vuePropsMake<CollapsePanelProps>(propTypes, defaultProps);
-const CollapsePanel = defineComponent<CollapsePanelProps>(
-  (props, {}) => {
+export const vuePropsType = vuePropsMake(propTypes, defaultProps);
+const CollapsePanel = defineComponent({
+  props: { ...vuePropsType },
+  name: 'CollapsePanel',
+  setup(props, {}) {
     let ariaID: string = '';
     onMounted(() => {
       ariaID = getUuidShort({});
@@ -148,10 +165,6 @@ const CollapsePanel = defineComponent<CollapsePanelProps>(
       );
     };
   },
-  {
-    props: vuePropsType,
-    name: 'CollapsePanel',
-  }
-);
+});
 
 export default CollapsePanel;

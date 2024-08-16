@@ -1,7 +1,8 @@
 import { defineComponent, ref, h, Fragment, useSlots } from 'vue';
 import Switch from '../index';
 import Space from '../../space';
-import { Button } from '../../index';
+import Button from '../../button';
+
 
 interface SwitchDemoProps {
   name?: string;
@@ -10,7 +11,7 @@ interface SwitchDemoProps {
 export const vuePropsType = {
   name: String,
 };
-const SwitchDemo = defineComponent<SwitchDemoProps>(
+const SwitchDemo = defineComponent(
   (props, {}) => {
     const slots = useSlots();
 

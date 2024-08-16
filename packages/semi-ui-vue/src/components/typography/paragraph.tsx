@@ -19,10 +19,11 @@ import {
   OmitTypographyProps,
 } from './interface';
 import { CopyableConfig, LinkType } from './title';
+import { CombineProps } from '../interface';
 
 type OmitParagraphProps = OmitTypographyProps;
 
-export interface ParagraphProps extends Omit<HTMLAttributes, OmitParagraphProps> {
+export interface ParagraphProps {
   className?: string;
   component_?: any;
   copyable?: CopyableConfig | boolean;
@@ -63,7 +64,7 @@ export interface ParagraphProps extends Omit<HTMLAttributes, OmitParagraphProps>
 
 const prefixCls = cssClasses.PREFIX;
 
-export const vuePropsType: ComponentObjectPropsOptions<ParagraphProps> = {
+export const vuePropsType: CombineProps<ParagraphProps> = {
   copyable: {
     type: [Object, Boolean],
     default: false,
@@ -94,7 +95,7 @@ export const vuePropsType: ComponentObjectPropsOptions<ParagraphProps> = {
     default: false,
   },
   link: {
-    type: [Boolean, Object],
+    type: [Boolean, Object, String],
     default: false,
   },
   type: {
@@ -117,17 +118,18 @@ export const vuePropsType: ComponentObjectPropsOptions<ParagraphProps> = {
     type: String,
     default: '',
   },
+  component_: {
+    type: [Object, String, Function],
+  },
 };
-const paragraph = defineComponent<ParagraphProps>(
-  (props, { slots }) => {
+const paragraph = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Paragraph',
+  setup(props, { slots, attrs }) {
     const { className } = props;
     const paragraphCls = cls(className, `${prefixCls}-paragraph`);
-    return () => <Base children={slots.default?.()} component_={'p'} {...props} className={paragraphCls}></Base>;
+    return () => <Base children={slots.default?.()} {...{...props, component_: props.component_ || 'p'}} {...attrs} className={paragraphCls}></Base>;
   },
-  {
-    props: vuePropsType,
-    name: 'Paragraph',
-  }
-);
+});
 
 export default paragraph;

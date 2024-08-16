@@ -1,7 +1,7 @@
 import {defineComponent, ref, h, Fragment, useSlots, CSSProperties, onMounted} from 'vue';
 import Carousel from '../index';
-import { Space } from '../../index';
 import { Paragraph, Title } from '../../typography';
+import Space from '../../space';
 
 interface CarouselDemoProps {
   name?: string;
@@ -10,7 +10,7 @@ interface CarouselDemoProps {
 export const vuePropsType = {
   name: String,
 };
-const CarouselDemo = defineComponent<CarouselDemoProps>((props, {}) => {
+const CarouselDemo = defineComponent((props, {}) => {
   const slots = useSlots();
 
   const style = {
@@ -78,7 +78,7 @@ const CarouselDemo = defineComponent<CarouselDemoProps>((props, {}) => {
     </div>
   );
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'CarouselDemo'
 });
 

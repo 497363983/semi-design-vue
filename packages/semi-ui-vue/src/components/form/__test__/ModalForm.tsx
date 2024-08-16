@@ -1,13 +1,11 @@
-import {
-  Button,
-  Form,
-  FormCheckboxGroup,
-  FormInput,
-  Space,
-  Toast,
-} from "../../index";
+
 import type { FormApi } from "../index";
 import { defineComponent, ref, h, Fragment, useSlots, reactive } from "vue";
+import Button from '../../button';
+import { Form, FormCheckboxGroup, FormInput } from '../index';
+import Space from '../../space';
+import Toast from '../../toast';
+
 
 interface ModalFormProps {
   name?: string;
@@ -16,7 +14,7 @@ interface ModalFormProps {
 export const vuePropsType = {
   name: String,
 };
-const ModalForm = defineComponent<ModalFormProps>((props) => {
+const ModalForm = defineComponent((props) => {
   const slots = useSlots();
   const state = reactive<{ formApi: FormApi<any> }>({ formApi: null });
 

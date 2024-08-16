@@ -12,7 +12,10 @@ export type TypographyType = typeof BaseTypography & {
 };
 
 const Typography = BaseTypography as TypographyType;
-
+Typography.Text = Text
+Typography.Title = Title
+Typography.Paragraph = Paragraph
+Typography.Numeral = Numeral
 
 
 
@@ -22,6 +25,7 @@ const Typography = BaseTypography as TypographyType;
 // export { TextProps } from './Text';
 // export { ParagraphProps } from './Paragraph';
 export * from './interface';
+export default Typography
 export {
     Typography,
     Text as TypographyText,

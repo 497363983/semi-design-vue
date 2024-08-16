@@ -1,21 +1,27 @@
 import * as PropTypes from '../PropTypes';
 import ColumnShape from './ColumnShape';
-import { ColumnProps } from './interface';
-import {defineComponent, h, useSlots} from "vue";
-import {vuePropsMake} from "../PropTypes";
+import { ColumnProps, Data } from './interface';
+import { ComponentObjectPropsOptions, defineComponent, h, useSlots } from 'vue';
+import { vuePropsMake } from '../PropTypes';
+import { CombineProps } from '../interface';
 
-const propTypes = {
+export function getColumn<RecordType extends Record<string, any> = Data>(){
+  const propTypes: CombineProps<ColumnProps<RecordType>> = {
     ...ColumnShape,
-};
-export const vuePropsType = vuePropsMake<ColumnProps>(propTypes, {});
-const Column = defineComponent<ColumnProps>((props, {}) => {
-    const slots = useSlots();
+  };
+  const vuePropsType = vuePropsMake(propTypes, {});
+  const Column = defineComponent({
+    props: { ...vuePropsType },
+    name: 'Column',
+    setup(props, {}) {
+      const slots = useSlots();
 
-    return () => null;
-}, {
-    props: vuePropsType,
-    name: 'Column'
-});
+      return () => null;
+    },
+  });
 
+  return Column
+}
 
+const Column = getColumn()
 export default Column;

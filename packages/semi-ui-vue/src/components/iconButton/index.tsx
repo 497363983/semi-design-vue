@@ -1,20 +1,18 @@
-import {defineComponent, ref, h, StyleValue, isVNode, Fragment, PropType} from 'vue'
+import { defineComponent, ref, h, StyleValue, isVNode, Fragment, PropType, ComponentObjectPropsOptions } from 'vue';
 import classNames from 'classnames';
 import * as PropTypes from '../PropTypes';
 
-import {cssClasses, strings} from '@douyinfe/semi-foundation/button/constants';
-import {strings as iconStrings} from '@douyinfe/semi-foundation/icons/constants';
-import Button, {Theme, ButtonProps, Size, Type} from '../button/Button';
+import { cssClasses, strings } from '@douyinfe/semi-foundation/button/constants';
+import { strings as iconStrings } from '@douyinfe/semi-foundation/icons/constants';
+import Button, { Theme, ButtonProps, Size, Type } from '../button/Button';
+import { vuePropsType as buttonVuePropsType } from '../button/Button';
 import SpinIcon from '../spin/icon';
-import {noop} from 'lodash';
+import { noop } from 'lodash';
 import '@douyinfe/semi-foundation/button/iconButton.scss';
-import {getFragmentChildren} from "../_utils";
-import {vuePropsMake} from "../PropTypes";
-import {BaseFormProps} from "../form";
+import { getFragmentChildren } from '../_utils';
+import { vuePropsMake } from '../PropTypes';
 import { useHasInProps } from '../_base/baseComponent';
-
-
-
+import { CombineProps } from '../interface';
 
 const iconSizes = iconStrings.SIZE;
 
@@ -33,9 +31,11 @@ export interface IconButtonProps extends ButtonProps {
   disabled?: boolean;
   noHorizontalPadding?: boolean | HorizontalPaddingType | HorizontalPaddingType[];
   prefixCls?: string;
-  autoFocus?: boolean
+  autoFocus?: boolean;
+  contentClassName?: string;
 }
-const vuePropsType= vuePropsMake<IconButtonProps>({
+const propsType: CombineProps<IconButtonProps> = {
+  ...buttonVuePropsType,
   iconStyle: PropTypes.object,
   style: PropTypes.object,
   loading: PropTypes.bool,
@@ -48,93 +48,109 @@ const vuePropsType= vuePropsMake<IconButtonProps>({
   className: PropTypes.string,
   onMouseEnter: PropTypes.func,
   onMouseLeave: PropTypes.func,
-  class: String
-}, {
-  iconPosition: strings.DEFAULT_ICON_POSITION,
-  prefixCls: cssClasses.PREFIX,
-  loading: false,
-  noHorizontalPadding: false, //  true same as ['left', 'right']
-  onMouseEnter: noop,
-  onMouseLeave: noop,
-})
+  class: String,
+  role: String,
+  contentClassName: String,
+}
+const vuePropsType = vuePropsMake<IconButtonProps>(
+  propsType,
+  {
+    iconPosition: strings.DEFAULT_ICON_POSITION,
+    prefixCls: cssClasses.PREFIX,
+    loading: false,
+    noHorizontalPadding: false, //  true same as ['left', 'right']
+    onMouseEnter: noop,
+    onMouseLeave: noop,
+  }
+);
 
 // TODO: add a buttonGroup component
 // TODO: icon configuration
-const Index = defineComponent<IconButtonProps>((props, {slots}) => {
+const Index = defineComponent({
+  props: { ...vuePropsType },
+  name: 'IconButton',
+  setup(props, { slots }) {
+    const { getProps } = useHasInProps();
 
-  const {getProps} = useHasInProps()
+    return () => {
+      const {
+        iconPosition,
+        iconSize,
+        iconStyle,
+        style: originStyle,
+        icon,
+        noHorizontalPadding,
+        theme,
+        className,
+        prefixCls,
+        loading,
+        ...otherProps
+      } = getProps(props);
 
-  return () => {
+      const style: any = originStyle;
+      // TODO: review check
+      if (Array.isArray(noHorizontalPadding)) {
+        noHorizontalPadding.includes('left') && (style.paddingLeft = 0);
+        noHorizontalPadding.includes('right') && (style.paddingRight = 0);
+      } else if (noHorizontalPadding === true) {
+        style.paddingLeft = 0;
+        style.paddingRight = 0;
+      }
 
-    const {
-      iconPosition,
-      iconSize,
-      iconStyle,
-      style: originStyle,
-      icon,
-      noHorizontalPadding,
-      theme,
-      className,
-      prefixCls,
-      loading,
-      ...otherProps
-    } = getProps(props);
+      let finalChildren = null;
 
-    const style: any = originStyle;
-    // TODO: review check
-    if (Array.isArray(noHorizontalPadding)) {
-      noHorizontalPadding.includes('left') && (style.paddingLeft = 0);
-      noHorizontalPadding.includes('right') && (style.paddingRight = 0);
-    } else if (noHorizontalPadding === true) {
-      style.paddingLeft = 0;
-      style.paddingRight = 0;
-    }
+      const btnTextCls = classNames({
+        [`${prefixCls}-content-left`]: iconPosition === 'right',
+        [`${prefixCls}-content-right`]: iconPosition === 'left',
+      });
 
-    let finalChildren = null;
+      return (
+        <Button
+          {...otherProps}
+          className={classNames(className, `${prefixCls}-with-icon`, {
+            [`${prefixCls}-with-icon-only`]: !slots.default || !slots.default(),
+            [`${prefixCls}-loading`]: loading,
+          })}
+          theme={theme}
+          style={style}
+        >
+          {{
+            default: () => {
+              let IconElem = (): any => null;
 
-
-    const btnTextCls = classNames({
-      [`${prefixCls}-content-left`]: iconPosition === 'right',
-      [`${prefixCls}-content-right`]: iconPosition === 'left',
-    });
-
-
-    return (
-      <Button {...otherProps} className={classNames(className, `${prefixCls}-with-icon`, {
-        [`${prefixCls}-with-icon-only`]: !slots.default || !slots.default(),
-        [`${prefixCls}-loading`]: loading,
-      })} theme={theme} style={style}>
-        {{
-          default: () => {
-            let IconElem = (): any => null;
-
-            if (loading && !otherProps.disabled) {
-              IconElem = () => <SpinIcon/>;
-            } else if (isVNode(icon)) {
-              IconElem = () => icon;
-            }
-            const children = () => getFragmentChildren(slots) ?
-              <span class={IconElem() ? btnTextCls : ''}>{slots.default ? slots.default() : null}</span> : null;
-            if (iconPosition === 'left') {
-              return <>
-                {IconElem()}
-                {children ? children() : null}
-              </>;
-            } else {
-              return <>
-                {children ? children() : null}
-                {IconElem()}
-              </>;
-            }
-          }
-        }}
-      </Button>
-    )
-  };
-},{
-  props: vuePropsType,
-  name:'IconButton'
-})
+              if (loading && !otherProps.disabled) {
+                IconElem = () => <SpinIcon />;
+              } else if (isVNode(icon)) {
+                IconElem = () => icon;
+              } else if (typeof icon.setup === 'function') {
+                IconElem = () => <icon />;
+              }
+              const children = () =>
+                getFragmentChildren(slots) ? (
+                  <span class={IconElem() ? btnTextCls : ''}>{slots.default ? slots.default() : null}</span>
+                ) : null;
+              if (iconPosition === 'left') {
+                return (
+                  <>
+                    {IconElem()}
+                    {children ? children() : null}
+                  </>
+                );
+              } else {
+                return (
+                  <>
+                    {children ? children() : null}
+                    {IconElem()}
+                  </>
+                );
+              }
+            },
+          }}
+        </Button>
+      );
+    };
+  },
+});
 
 export const VuePropsType = {
   icon: [Object, String],
@@ -157,15 +173,14 @@ export const VuePropsType = {
   disabled: Boolean,
   noHorizontalPadding: {
     type: [Boolean, String, Array],
-    default: false //  true same as ['left', 'right']
+    default: false, //  true same as ['left', 'right']
   },
   prefixCls: {
     type: String,
-    default : cssClasses.PREFIX,
+    default: cssClasses.PREFIX,
   },
   onMouseEnter: Function,
   onMouseLeave: Function,
-
 
   id: String,
   block: Boolean,
@@ -174,9 +189,9 @@ export const VuePropsType = {
   size: String,
   type: String,
   // 否则会出现重复执行的情况
-  onClick:Function,
-  onMouseDown:Function,
-  autoFocus:Function,
-}
+  onClick: Function,
+  onMouseDown: Function,
+  autoFocus: Function,
+};
 
-export default Index
+export default Index;

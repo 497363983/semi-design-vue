@@ -29,7 +29,7 @@ import { numbers as popoverNumbers } from '@douyinfe/semi-foundation/popover/con
 import { FixedSizeList as VirtualList } from '@kousum/vue3-window';
 import '@douyinfe/semi-foundation/tree/tree.scss';
 import '@douyinfe/semi-foundation/treeSelect/treeSelect.scss';
-import { getProps, useBaseComponent, ValidateStatus } from '../_base/baseComponent';
+import { useBaseComponent, useHasInProps, ValidateStatus } from '../_base/baseComponent';
 import TagGroup from '../tag/group';
 import Tag, { TagProps } from '../tag/index';
 import Input, { InputProps } from '../input/index';
@@ -65,7 +65,7 @@ import {
   watch,
 } from 'vue';
 import { AriaAttributes } from '../AriaAttributes';
-import { VueHTMLAttributes, VueJsxNode, VueJsxNodeSingle } from '../interface';
+import { CombineProps, VueHTMLAttributes, VueJsxNode, VueJsxNodeSingle } from '../interface';
 import Popover, { PopoverProps } from '../popover/index';
 import VirtualRow from '../select/virtualRow';
 
@@ -170,6 +170,7 @@ export interface TreeSelectProps
   onFocus?: (e: MouseEvent) => void;
   onVisibleChange?: (isVisible: boolean) => void;
   onClear?: (e: MouseEvent | KeyboardEvent) => void;
+  autoMergeValue?: boolean;
   id?: string;
 }
 
@@ -194,7 +195,7 @@ const prefixTree = cssClasses.PREFIX_TREE;
 
 const key = 0;
 
-const propTypes: ComponentObjectPropsOptions<TreeSelectProps> = {
+const propTypes: CombineProps<TreeSelectProps> = {
   'aria-describedby': PropTypes.string,
   'aria-errormessage': PropTypes.string,
   'aria-invalid': PropTypes.bool,
@@ -281,6 +282,7 @@ const propTypes: ComponentObjectPropsOptions<TreeSelectProps> = {
   restTagsPopoverProps: PropTypes.object,
   preventScroll: PropTypes.bool,
   clickTriggerToHide: PropTypes.bool,
+  autoMergeValue: PropTypes.bool,
 
   dropdownMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
   position: PropTypes.string as PropType<TreeSelectProps['position']>,
@@ -317,12 +319,15 @@ const defaultProps: Partial<TreeSelectProps> = {
   showRestTagsPopover: false,
   restTagsPopoverProps: {},
   clickTriggerToHide: true,
+  autoMergeValue: true,
 };
 export const vuePropsType = vuePropsMake(propTypes, defaultProps);
-const TreeSelect = defineComponent<TreeSelectProps>(
-  (props, {}) => {
+const TreeSelect = defineComponent({
+  props: { ...vuePropsType } as CombineProps<TreeSelectProps>,
+  name: 'TreeSelect',
+  setup(props, {}) {
+    const { getProps } = useHasInProps();
     const slots = useSlots();
-
     // let _flattenNodes: TreeState['flattenNodes'];
     const state = reactive<TreeSelectState>({
       inputTriggerFocus: false,
@@ -359,10 +364,10 @@ const TreeSelect = defineComponent<TreeSelectProps>(
     const optionsRef = ref();
     let clickOutsideHandler = null;
     const treeSelectID = Math.random().toString(36).slice(2);
+    let clearInputFlag: boolean = false;
 
     let onNodeClick;
     let onNodeDoubleClick;
-    let clearInputFlag: boolean = false;
 
     // TODO context
     const { adapter: adapterInject, context, getDataAttr } = useBaseComponent<TreeSelectProps>(props, state);
@@ -377,6 +382,7 @@ const TreeSelect = defineComponent<TreeSelectProps>(
         'registerClickOutsideHandler' | 'unregisterClickOutsideHandler' | 'rePositionDropdown'
       > = {
         registerClickOutsideHandler: (cb) => {
+          adapter.unregisterClickOutsideHandler();
           clickOutsideHandler = (e: Event) => {
             // 当组件内部使用了expose时，使用ref得到的内容只有expose的那部分
             const optionInstance = optionsRef && optionsRef.value.getRef?.().vnode.el;
@@ -384,14 +390,11 @@ const TreeSelect = defineComponent<TreeSelectProps>(
             // eslint-disable-next-line
             const optionsDom = optionInstance;
             const target = e.target as Element;
-            const path = e.composedPath && e.composedPath() || [target];
+            const path = (e.composedPath && e.composedPath()) || [target];
             // console.log(optionsRef.value, (optionInstance as HTMLElement).parentNode, target)
             if (
               optionsDom &&
-              (
-                !optionsDom.contains(target) ||
-                !optionsDom.contains(target.parentNode)
-              ) &&
+              (!optionsDom.contains(target) || !optionsDom.contains(target.parentNode)) &&
               triggerDom &&
               !triggerDom.contains(target) &&
               !(path.includes(triggerDom) || path.includes(optionsDom))
@@ -519,12 +522,6 @@ const TreeSelect = defineComponent<TreeSelectProps>(
         updateIsFocus: (bool) => {
           state.isFocus = bool;
         },
-        setClearInputFlag: (flag: boolean) => {
-          clearInputFlag = flag;
-        },
-        getClearInputFlag: () => {
-          return clearInputFlag;
-        }
       };
     }
     const adapter = adapter_();
@@ -905,7 +902,7 @@ const TreeSelect = defineComponent<TreeSelectProps>(
       };
       const popoverCls = cls(dropdownClassName, `${prefixcls}-popover`);
       return (
-        <div class={popoverCls} style={style}>
+        <div class={popoverCls} style={style} onKeydown={foundation.handleKeyDown}>
           {renderTree()}
         </div>
       );
@@ -952,15 +949,14 @@ const TreeSelect = defineComponent<TreeSelectProps>(
       return showClear && (hasValue() || triggerSearchHasInputValue) && !disabled && (isOpen || isHovering);
     };
 
-    const renderTagList = () => {
-      const { checkedKeys, keyEntities, disabledKeys, realCheckedKeys } = state;
+    const renderTagList = (triggerRenderKeys: string[]) => {
+      const { keyEntities, disabledKeys } = state;
       const {
         treeNodeLabelProp,
         leafOnly,
         disabled,
         disableStrictly,
         size,
-        checkRelation,
         renderSelectedItem: propRenderSelectedItem,
         keyMaps,
       } = props;
@@ -971,15 +967,10 @@ const TreeSelect = defineComponent<TreeSelectProps>(
             isRenderInTag: true,
             content: get(item, realLabelName, null),
           });
-      let renderKeys = [];
-      if (checkRelation === 'related') {
-        renderKeys = normalizeKeyList([...checkedKeys], keyEntities, leafOnly);
-      } else if (checkRelation === 'unRelated' && Object.keys(keyEntities).length > 0) {
-        renderKeys = [...realCheckedKeys];
-      }
+
       const tagList: VueJsxNodeSingle[] = [];
       // eslint-disable-next-line @typescript-eslint/no-shadow
-      renderKeys.forEach((key: TreeNodeData['key'], index) => {
+      triggerRenderKeys.forEach((key: TreeNodeData['key'], index) => {
         const item =
           keyEntities[key] && keyEntities[key].key === key ? keyEntities[key].data : getDataForKeyNotInKeyEntities(key);
         const onClose = (tagContent: any, e: MouseEvent) => {
@@ -1025,7 +1016,11 @@ const TreeSelect = defineComponent<TreeSelectProps>(
         [`${prefixcls}-selection-TriggerSearchItem-placeholder`]: (inputTriggerFocus || !renderText) && !disabled,
         [`${prefixcls}-selection-TriggerSearchItem-disabled`]: disabled,
       });
-      return <span class={spanCls}>{renderText ? renderText : placeholder}</span>;
+      return (
+        <span class={spanCls} onClick={foundation.onClickSingleTriggerSearchItem}>
+          {renderText ? renderText : placeholder}
+        </span>
+      );
     };
 
     /**
@@ -1035,13 +1030,13 @@ const TreeSelect = defineComponent<TreeSelectProps>(
       const { inputValue } = state;
       return (
         <>
-          {!inputValue && renderSingleTriggerSearchItem()}
           {renderInput()}
+          {!inputValue && renderSingleTriggerSearchItem()}
         </>
       );
     };
 
-    const renderSelectContent = () => {
+    const renderSelectContent = (triggerRenderKeys: string[]) => {
       const {
         multiple,
         placeholder,
@@ -1054,7 +1049,7 @@ const TreeSelect = defineComponent<TreeSelectProps>(
       const isTriggerPositionSearch = filterTreeNode && searchPosition === strings.SEARCH_POSITION_TRIGGER;
       // searchPosition = trigger
       if (isTriggerPositionSearch) {
-        return multiple ? renderTagInput() : renderSingleTriggerSearch();
+        return multiple ? renderTagInput(triggerRenderKeys) : renderSingleTriggerSearch();
       }
       // searchPosition = dropdown and single seleciton
       if (!multiple || !hasValue()) {
@@ -1065,7 +1060,7 @@ const TreeSelect = defineComponent<TreeSelectProps>(
         return <span class={spanCls}>{renderText ? renderText : placeholder}</span>;
       }
       // searchPosition = dropdown and multiple seleciton
-      const tagList = renderTagList();
+      const tagList = renderTagList(triggerRenderKeys);
       // mode=custom to return tagList directly
       return (
         <TagGroup
@@ -1162,6 +1157,7 @@ const TreeSelect = defineComponent<TreeSelectProps>(
         searchPosition,
         triggerRender,
         borderless,
+        autoMergeValue,
         checkRelation,
         ...rest
       } = props;
@@ -1201,42 +1197,42 @@ const TreeSelect = defineComponent<TreeSelectProps>(
             className
           );
       let inner: VNode | VNode[];
-      if (useCustomTrigger) {
-        let triggerRenderKeys = [];
-        if (multiple) {
-          if (checkRelation === 'related') {
-            triggerRenderKeys = normalizeKeyList([...checkedKeys], keyEntities, leafOnly, true);
-          } else if (checkRelation === 'unRelated') {
-            triggerRenderKeys = [...realCheckedKeys];
-          }
-        } else {
-          triggerRenderKeys = selectedKeys;
+      let triggerRenderKeys = [];
+      if (multiple) {
+        if (!autoMergeValue) {
+          triggerRenderKeys = [...checkedKeys];
+        } else if (checkRelation === 'related') {
+          triggerRenderKeys = normalizeKeyList([...checkedKeys], keyEntities, leafOnly, true);
+        } else if (checkRelation === 'unRelated') {
+          triggerRenderKeys = [...realCheckedKeys];
         }
-        inner = <Trigger
-          inputValue={inputValue}
-          value={triggerRenderKeys.map((key: string) => get(keyEntities, [key, 'data']))}
-          disabled={disabled}
-          placeholder={placeholder}
-          onClear={handleClear}
-          componentName={'TreeSelect'}
-          triggerRender={triggerRender}
-          componentProps={{ ...props }}
-          onSearch={search}
-          onRemove={removeTag}
-        />;
+      } else {
+        triggerRenderKeys = selectedKeys;
+      }
+      if (useCustomTrigger) {
+        inner = (
+          <Trigger
+            inputValue={inputValue}
+            value={triggerRenderKeys.map((key: string) => get(keyEntities, [key, 'data']))}
+            disabled={disabled}
+            placeholder={placeholder}
+            onClear={handleClear}
+            componentName={'TreeSelect'}
+            triggerRender={triggerRender}
+            componentProps={{ ...props }}
+            onSearch={search}
+            onRemove={removeTag}
+          />
+        );
       } else {
         inner = [
           <Fragment key={'prefix'}>{prefix || insetLabel ? renderPrefix() : null}</Fragment>,
           <Fragment key={'selection'}>
-            <div class={`${prefixcls}-selection`}>{renderSelectContent()}</div>
+            <div class={`${prefixcls}-selection`}>{renderSelectContent(triggerRenderKeys)}</div>
           </Fragment>,
           <Fragment key={'suffix'}>{suffix ? renderSuffix() : null}</Fragment>,
           <Fragment key={'clearBtn'}>
-            {
-              (showClear || (isTriggerPositionSearch && inputValue)) ?
-                renderClearBtn() :
-                null
-            }
+            {showClear || (isTriggerPositionSearch && inputValue) ? renderClearBtn() : null}
           </Fragment>,
           <Fragment key={'arrow'}>{renderArrow()}</Fragment>,
         ];
@@ -1330,28 +1326,20 @@ const TreeSelect = defineComponent<TreeSelectProps>(
       return <Tag {...tagProps}>{value}</Tag>;
     };
 
-    const renderTagInput = () => {
+    const renderTagInput = (triggerRenderKeys: string[]) => {
       const {
-        leafOnly,
         disabled,
         size,
         searchAutoFocus,
         placeholder,
         maxTagCount,
-        checkRelation,
         showRestTagsPopover,
         restTagsPopoverProps,
         searchPosition,
         filterTreeNode,
         preventScroll,
       } = props;
-      const { keyEntities, checkedKeys, inputValue, realCheckedKeys } = state;
-      let keyList = [];
-      if (checkRelation === 'related') {
-        keyList = normalizeKeyList(checkedKeys, keyEntities, leafOnly, true);
-      } else if (checkRelation === 'unRelated') {
-        keyList = [...realCheckedKeys];
-      }
+      const { inputValue } = state;
       // auto focus search input divide into two parts
       // 1. filterTreeNode && searchPosition === strings.SEARCH_POSITION_TRIGGER
       //    Implemented by passing autofocus to the underlying input's autofocus
@@ -1368,7 +1356,7 @@ const TreeSelect = defineComponent<TreeSelectProps>(
           onInputChange={(v) => search(v)}
           ref={tagInputRef}
           placeholder={placeholder}
-          value={keyList}
+          value={triggerRenderKeys}
           inputValue={inputValue}
           size={size}
           showRestTagsPopover={showRestTagsPopover}
@@ -1497,13 +1485,13 @@ const TreeSelect = defineComponent<TreeSelectProps>(
     };
 
     /* Event handler function after popover visible change */
-    const handlePopoverVisibleChange = isVisible => {
+    const handlePopoverVisibleChange = (isVisible) => {
       foundation.handlePopoverVisibleChange(isVisible);
-    }
+    };
 
     const afterClose = () => {
       foundation.handleAfterClose();
-    }
+    };
 
     const renderTreeNode = (treeNode: FlattenNode, ind: number, style: CSSProperties) => {
       const { data, key } = treeNode;
@@ -1698,10 +1686,6 @@ const TreeSelect = defineComponent<TreeSelectProps>(
       );
     };
   },
-  {
-    props: vuePropsType,
-    name: 'TreeSelect',
-  }
-);
+});
 
 export default TreeSelect;

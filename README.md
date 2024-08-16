@@ -14,7 +14,8 @@
 [ci-badge]: https://github.com/rashagu/semi-design-vue/workflows/publish/badge.svg?branch=master&event=push
 [ci-url]: https://github.com/rashagu/semi-design-vue/actions?query=branch%3Amaster+event%3Apush
 
-
+# Demo
+> [https://stackblitz.com/edit/vitejs-vite-ao3gtf](https://stackblitz.com/edit/vitejs-vite-ao3gtf)
 
 # 🔥 安装
 
@@ -59,7 +60,7 @@ Thanks to [JetBrains](https://jb.gg/OpenSourceSupport) for providing Open Source
 
 # 开发
 1. 使用`typescript`,`changeSets`
-2. `node: >= 16`
+2. `node: >= 18`
 3. `vue: >= 3.3`
 
 

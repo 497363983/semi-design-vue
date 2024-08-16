@@ -1,16 +1,13 @@
 import {
-  defineComponent,
-  ref,
-  h,
-  Fragment,
-  reactive,
-  onMounted,
-  ComponentObjectPropsOptions,
-  PropType,
-  VNode,
-  onUnmounted,
-  isVNode,
   cloneVNode,
+  ComponentObjectPropsOptions,
+  defineComponent,
+  h,
+  isVNode,
+  onUnmounted,
+  PropType,
+  reactive,
+  VNode,
 } from 'vue';
 import Tooltip from '../tooltip';
 import { cssClasses } from '@douyinfe/semi-foundation/typography/constants';
@@ -22,6 +19,8 @@ import { IconCopy, IconTick } from '@kousum/semi-icons-vue';
 import { BaseProps } from '../_base/baseComponent';
 import { Locale } from '../locale/interface';
 import isEnterPress from '@douyinfe/semi-foundation/utils/isEnterPress';
+import * as PropTypes from '../PropTypes';
+import { CombineProps } from '../interface';
 
 const prefixCls = cssClasses.PREFIX;
 export interface CopyableProps extends BaseProps {
@@ -38,7 +37,7 @@ interface CopyableState {
   item: string;
 }
 
-export const vuePropsType: ComponentObjectPropsOptions<CopyableProps> = {
+export const vuePropsType: CombineProps<CopyableProps> = {
   forwardRef: Object,
   content: {
     type: String,
@@ -60,10 +59,15 @@ export const vuePropsType: ComponentObjectPropsOptions<CopyableProps> = {
     type: String,
     default: '',
   },
+  copyTip: PropTypes.node,
+  successTip: PropTypes.node,
+  icon: PropTypes.node as PropType<CopyableProps['icon']>,
 };
 
-const Copyable = defineComponent<CopyableProps>(
-  (props, { slots }) => {
+const Copyable = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Copyable',
+  setup(props, { slots }) {
     let _timeId: ReturnType<typeof setTimeout>;
 
     const state = reactive({
@@ -123,26 +127,25 @@ const Copyable = defineComponent<CopyableProps>(
     const renderCopyIcon = () => {
       const { icon } = props;
       const copyProps = {
-        role: "button",
+        role: 'button',
         tabIndex: 0,
         onClick: copy,
-        onKeyPress: e => isEnterPress(e) && copy(e as any),
+        onKeyPress: (e) => isEnterPress(e) && copy(e as any),
       };
 
-      {/* TODO: replace `a` tag with `span` in next major version
-            NOTE: may have effect on style */}
+      {
+        /* TODO: replace `a` tag with `span` in next major version
+            NOTE: may have effect on style */
+      }
       const defaultIcon = (
         // eslint-disable-next-line jsx-a11y/anchor-is-valid
         <a class={`${prefixCls}-action-copy-icon`}>
-          <IconCopy
-            onClick={copy}
-            {...copyProps}
-          />
+          <IconCopy onClick={copy} {...copyProps} />
         </a>
       );
 
       return isVNode(icon) ? cloneVNode(icon, copyProps) : defaultIcon;
-    }
+    };
     return () => {
       const { style, className, forwardRef, copyTip } = props;
       const { copied } = state;
@@ -165,10 +168,6 @@ const Copyable = defineComponent<CopyableProps>(
       );
     };
   },
-  {
-    props: vuePropsType,
-    name: 'Copyable',
-  }
-);
+});
 
 export default Copyable;

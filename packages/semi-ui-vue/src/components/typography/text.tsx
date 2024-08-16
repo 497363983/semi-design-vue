@@ -6,16 +6,17 @@ import {
   HTMLAttributes,
   CSSProperties,
   ComponentObjectPropsOptions,
-  PropType
-} from 'vue'
+  PropType,
+} from 'vue';
 import Base from './base';
 import { Ellipsis, TypographyBaseSize, TypographyBaseType, OmitTypographyProps } from './interface';
 import { CopyableConfig, LinkType } from './title';
+import { CombineProps } from '../interface';
 
 type OmitTextProps = OmitTypographyProps;
 
-export interface TextProps extends Omit<HTMLAttributes, OmitTextProps> {
-  children?: any;
+export interface TextProps {
+  // children?: any;
   className?: string;
   code?: boolean;
   component_?: any;
@@ -31,10 +32,10 @@ export interface TextProps extends Omit<HTMLAttributes, OmitTextProps> {
   style?: CSSProperties;
   type?: TypographyBaseType;
   underline?: boolean;
+  weight?: number;
 }
 
-
-export const vuePropsType:ComponentObjectPropsOptions<TextProps> = {
+export const vuePropsType: CombineProps<TextProps> = {
   copyable: {
     type: [Object, Boolean],
     default: false,
@@ -48,7 +49,7 @@ export const vuePropsType:ComponentObjectPropsOptions<TextProps> = {
     default: false,
   },
   icon: {
-    type: [Object,String],
+    type: [Object, String],
     default: '',
   },
   // editable: false,
@@ -69,7 +70,7 @@ export const vuePropsType:ComponentObjectPropsOptions<TextProps> = {
     default: false,
   },
   link: {
-    type: [Boolean, Object],
+    type: [Boolean, Object, String],
     default: false,
   },
   type: {
@@ -88,23 +89,28 @@ export const vuePropsType:ComponentObjectPropsOptions<TextProps> = {
     type: String,
     default: '',
   },
-}
+  component_: {
+    type: [Object, String, Function],
+  },
+  weight: Number,
+  code: Boolean,
+};
 
+const Text = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Text',
+  setup(props, { slots }) {
+    return () => {
 
-const Text = defineComponent<TextProps>((props, {slots}) => {
+      return (
+        <Base children={slots.default?.()} {...{...props, component_: props.component_ || 'span'}}>
+          {{
+            default: slots.default,
+          }}
+        </Base>
+      );
+    };
+  },
+});
 
-  return () => {
-    return <Base children={slots.default?.()} component_={'span'} {...props} >
-      {{
-        default: slots.default
-      }}
-    </Base>;
-  }
-}, {
-  props: vuePropsType,
-  name: 'Text'
-})
-
-
-export default Text
-
+export default Text;

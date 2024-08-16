@@ -9,10 +9,10 @@ import {
   VNode,
   Fragment,
   Ref,
-  PropType
-} from 'vue'
+  PropType,
+} from 'vue';
 import cls from 'classnames';
-import {get} from 'lodash';
+import { get } from 'lodash';
 
 import DateInputFoundation, {
   DateInputAdapter,
@@ -20,22 +20,26 @@ import DateInputFoundation, {
   InsetInputChangeFoundationProps,
   InsetInputChangeProps,
   InsetInputProps,
-  RangeType
+  RangeType,
 } from '@douyinfe/semi-foundation/datePicker/inputFoundation';
-import {cssClasses, strings} from '@douyinfe/semi-foundation/datePicker/constants';
-import {noop} from '@douyinfe/semi-foundation/utils/function';
+import type {
+  RangeType as RangeType2,
+} from '@douyinfe/semi-foundation/datePicker/foundation';
+import { cssClasses, strings } from '@douyinfe/semi-foundation/datePicker/constants';
+import { noop } from '@douyinfe/semi-foundation/utils/function';
 import isNullOrUndefined from '@douyinfe/semi-foundation/utils/isNullOrUndefined';
-import {IconCalendar, IconCalendarClock, IconClear} from '@kousum/semi-icons-vue';
-import {BaseValueType, ValueType} from '@douyinfe/semi-foundation/datePicker/foundation';
+import { IconCalendar, IconCalendarClock, IconClear } from '@kousum/semi-icons-vue';
+import { BaseValueType, ValueType } from '@douyinfe/semi-foundation/datePicker/foundation';
 
-import {BaseProps, useBaseComponent} from '../_base/baseComponent';
-import Input from '../input/index';
-import {InsetDateInput, InsetTimeInput} from './insetInput';
-import * as PropTypes from "../PropTypes";
-import {vuePropsMake} from "../PropTypes";
-import {ComponentObjectPropsOptions} from "vue";
+import { BaseProps, useBaseComponent } from '../_base/baseComponent';
+import Input, { InputProps } from '../input/index';
+import { InsetDateInput, InsetTimeInput } from './insetInput';
+import * as PropTypes from '../PropTypes';
+import { vuePropsMake } from '../PropTypes';
+import { ComponentObjectPropsOptions } from 'vue';
+import { CombineProps, RemoveIndexSignature } from '../interface';
 
-export interface DateInputProps extends DateInputFoundationProps, BaseProps {
+export interface DateInputProps extends RemoveIndexSignature<DateInputFoundationProps>, BaseProps {
   insetLabel?: VNode;
   prefix?: VNode;
   onClick?: (e: MouseEvent) => void;
@@ -48,65 +52,85 @@ export interface DateInputProps extends DateInputFoundationProps, BaseProps {
   value?: Date[];
   inputRef?: Ref;
   rangeInputStartRef?: Ref;
-  rangeInputEndRef?: Ref
-  showClearIgnoreDisabled?: boolean
+  rangeInputEndRef?: Ref;
+  showClearIgnoreDisabled?: boolean;
+
+
+  //TODO
+  dateFnsLocale?: any
+  placeholder?: any
+  rangeInputFocus?: RangeType2
+  clearIcon?: any
+  inputValue?: string
+  block?: boolean
+  insetLabelId?: string
+  multiple?: boolean
+  size?: InputProps['size']
+  autofocus?: boolean
+  onRangeBlur?: (value: any, e: any) => void
+  onRangeClear?: (e: MouseEvent) => void
+  text?: string
+  handleInsetDateFocus?: (e: FocusEvent, rangeType: 'rangeStart' | 'rangeEnd') => void
+  handleInsetTimeFocus?: (e: FocusEvent) => void
+  suffix?: VNode,
+  inputCls?: string
 }
 
-const propTypes:ComponentObjectPropsOptions<DateInputProps> = {
+const propTypes: CombineProps<DateInputProps> = {
   borderless: {
     type: PropTypes.bool,
-    default: false
+    default: false,
   },
   onClick: {
     type: PropTypes.func as PropType<DateInputProps['onClick']>,
-    default: noop
+    default: noop,
   },
   onChange: {
     type: PropTypes.func as PropType<DateInputProps['onChange']>,
-    default: noop
+    default: noop,
   },
   onEnterPress: {
     type: PropTypes.func as PropType<DateInputProps['onEnterPress']>,
-    default: noop
+    default: noop,
   },
   onBlur: {
     type: PropTypes.func as PropType<DateInputProps['onBlur']>,
-    default: noop
+    default: noop,
   },
   onClear: {
     type: PropTypes.func as PropType<DateInputProps['onClear']>,
-    default: noop
+    default: noop,
   },
   onFocus: {
     type: PropTypes.func as PropType<DateInputProps['onFocus']>,
-    default: noop
+    default: noop,
   },
   value: PropTypes.array,
   disabled: PropTypes.bool,
-  type: {type: PropTypes.string as PropType<DateInputProps['type']>, default: 'date'},
+  type: { type: PropTypes.string as PropType<DateInputProps['type']>, default: 'date' },
   showClear: {
     type: PropTypes.bool,
-    default: true
+    default: true,
   },
   format: PropTypes.string, // Attributes not used
   inputStyle: {
     type: PropTypes.object,
-    default: () => ({})
+    default: () => ({}),
   },
   inputReadOnly: {
     type: PropTypes.bool,
-    default: false
+    default: false,
   }, // Text box can be entered
   insetLabel: PropTypes.node as PropType<DateInputProps['insetLabel']>,
   validateStatus: PropTypes.string as PropType<DateInputProps['validateStatus']>,
   prefix: PropTypes.node as PropType<DateInputProps['prefix']>,
-  prefixCls: {type: PropTypes.string, default: cssClasses.PREFIX},
+  prefixCls: { type: PropTypes.string, default: cssClasses.PREFIX },
   dateFnsLocale: PropTypes.any, // Foundation useful to
   placeholder: PropTypes.any,
-  rangeInputFocus: PropTypes.any,
+  rangeInputFocus: [PropTypes.string, PropTypes.bool] as PropType<DateInputProps['rangeInputFocus']>,
   rangeInputStartRef: PropTypes.object,
   rangeInputEndRef: PropTypes.object,
-  rangeSeparator: {type: PropTypes.string, default: strings.DEFAULT_SEPARATOR_RANGE},
+  rangeSeparator: { type: PropTypes.string, default: strings.DEFAULT_SEPARATOR_RANGE },
   insetInput: [PropTypes.bool, PropTypes.object],
   insetInputValue: PropTypes.object,
   defaultPickerValue: PropTypes.any as PropType<DateInputProps['defaultPickerValue']>,
@@ -116,17 +140,28 @@ const propTypes:ComponentObjectPropsOptions<DateInputProps> = {
   block: PropTypes.bool,
   insetLabelId: PropTypes.string,
   multiple: PropTypes.bool,
-  size: PropTypes.string,
+  size: PropTypes.string as PropType<InputProps['size']>,
   autofocus: PropTypes.bool,
 
-  onRangeBlur: PropTypes.func,
-  onRangeClear: PropTypes.func,
+  onRangeBlur: PropTypes.func as PropType<DateInputProps['onRangeBlur']>,
+  onRangeClear: PropTypes.func as PropType<DateInputProps['onRangeClear']>,
   onRangeEndTabPress: PropTypes.func as PropType<DateInputProps['onRangeEndTabPress']>,
 
   inputRef: PropTypes.object,
 
   showClearIgnoreDisabled: PropTypes.bool,
-}
+  onInsetInputChange: PropTypes.func as PropType<DateInputProps['onInsetInputChange']>,
+  panelType: PropTypes.string as PropType<DateInputProps['panelType']>,
+  density: PropTypes.string as PropType<DateInputProps['density']>,
+  onRangeInputClear: PropTypes.func as PropType<DateInputProps['onRangeInputClear']>,
+  style: PropTypes.object,
+  className: PropTypes.string,
+  text: PropTypes.string,
+  handleInsetDateFocus: PropTypes.func as PropType<DateInputProps['handleInsetDateFocus']>,
+  handleInsetTimeFocus: PropTypes.func as PropType<DateInputProps['handleInsetTimeFocus']>,
+  suffix: PropTypes.node as PropType<DateInputProps['suffix']>,
+  inputCls: String,
+};
 const defaultProps = {
   showClear: true,
   onClick: noop,
@@ -141,404 +176,398 @@ const defaultProps = {
   prefixCls: cssClasses.PREFIX,
   rangeSeparator: strings.DEFAULT_SEPARATOR_RANGE,
 };
-export const vuePropsType = vuePropsMake<DateInputProps>(propTypes, defaultProps)
-const dateInput = defineComponent<DateInputProps>((props, {}) => {
-  const slots = useSlots()
-  const state = reactive({isFocusing: false})
-  const {adapter: adapterInject} = useBaseComponent<DateInputProps>(props, state)
+export const vuePropsType = vuePropsMake<DateInputProps>(propTypes, defaultProps);
+const dateInput = defineComponent({
+  props: { ...vuePropsType },
+  name: 'dateInput',
+  setup(props, {}) {
+    const slots = useSlots();
+    const state = reactive({ isFocusing: false });
+    const { adapter: adapterInject } = useBaseComponent<DateInputProps>(props, state);
 
-  function adapter(): DateInputAdapter {
-    return {
-      ...adapterInject(),
-      updateIsFocusing: isFocusing => state.isFocusing = isFocusing,
-      notifyClick: (...args) => props.onClick(...args),
-      notifyChange: (...args) => props.onChange(...args),
-      notifyEnter: (...args) => props.onEnterPress(...args),
-      notifyBlur: (...args) => props.onBlur(...args),
-      notifyClear: (...args) => props.onClear(...args),
-      notifyFocus: (...args) => props.onFocus(...args),
-      notifyRangeInputClear: (...args) => props.onRangeClear(...args),
-      notifyRangeInputFocus: (...args) => props.onFocus(...args),
-      notifyTabPress: (...args) => props.onRangeEndTabPress(...args),
-      notifyInsetInputChange: options => props.onInsetInputChange(options),
+    function adapter(): DateInputAdapter {
+      return {
+        ...adapterInject(),
+        updateIsFocusing: (isFocusing) => (state.isFocusing = isFocusing),
+        notifyClick: (...args) => props.onClick(...args),
+        notifyChange: (...args) => props.onChange(...args),
+        notifyEnter: (...args) => props.onEnterPress(...args),
+        notifyBlur: (...args) => props.onBlur(...args),
+        notifyClear: (...args) => props.onClear(...args),
+        notifyFocus: (...args) => props.onFocus(...args),
+        notifyRangeInputClear: (...args) => props.onRangeClear(...args),
+        notifyRangeInputFocus: (...args) => props.onFocus(...args),
+        notifyTabPress: (...args) => props.onRangeEndTabPress(...args),
+        notifyInsetInputChange: (options) => props.onInsetInputChange(options),
+      };
     }
-  }
 
-  onMounted(() => {
-    foundation.init();
-  })
-
-  onUnmounted(() => {
-    foundation.destroy();
-  })
-  const foundation: DateInputFoundation = new DateInputFoundation(adapter());
-
-
-  function formatText(value: ValueType) {
-    // eslint-disable-next-line max-len
-    return value && (value as BaseValueType[]).length ? foundation.formatShowText(value as BaseValueType[]) : '';
-  }
-
-  const handleChange = (value: string, e: any) => foundation.handleChange(value, e);
-
-  const handleEnterPress = (e: KeyboardEvent) => foundation.handleInputComplete(e);
-
-  const handleInputClear = (e: MouseEvent) => foundation.handleInputClear(e);
-
-  const handleRangeInputChange = (rangeStart: string, rangeEnd: string, e: any) => {
-    const rangeInputValue = getRangeInputValue(rangeStart, rangeEnd);
-    foundation.handleChange(rangeInputValue, e);
-  };
-
-  const handleRangeInputClear: any = e => {
-    foundation.handleRangeInputClear(e);
-  };
-
-  const handleRangeInputEnterPress = (e: KeyboardEvent, rangeStart: string, rangeEnd: string) => {
-    const rangeInputValue = getRangeInputValue(rangeStart, rangeEnd);
-    foundation.handleRangeInputEnterPress(e, rangeInputValue);
-  };
-
-  const handleRangeInputEndKeyPress = (e: KeyboardEvent) => {
-    foundation.handleRangeInputEndKeyPress(e);
-  };
-
-  const handleRangeInputFocus = (e: MouseEvent, rangeType: RangeType) => {
-    foundation.handleRangeInputFocus(e, rangeType);
-  };
-
-  const handleRangeStartFocus: any = e => {
-    handleRangeInputFocus(e, 'rangeStart');
-  };
-
-  const handleInsetInputChange = (options: InsetInputChangeFoundationProps) => {
-    foundation.handleInsetInputChange(options);
-  };
-
-  const getRangeInputValue = (rangeStart: string, rangeEnd: string) => {
-    const {rangeSeparator} = props;
-    const rangeInputValue = `${rangeStart}${rangeSeparator}${rangeEnd}`;
-    return rangeInputValue;
-  };
-
-  function renderRangePrefix() {
-    const {prefix, insetLabel, prefixCls, disabled, rangeInputFocus} = props;
-    const labelNode = prefix || insetLabel;
-    return labelNode ? (
-      <div
-        class={`${prefixCls}-range-input-prefix`}
-        onClick={e => !disabled && !rangeInputFocus && handleRangeStartFocus(e)}
-        x-semi-prop="prefix,insetLabel"
-      >
-        {labelNode}
-      </div>
-    ) : null;
-  }
-
-  function renderRangeSeparator(rangeStart: string, rangeEnd: string) {
-    const {disabled, rangeSeparator} = props;
-    const separatorCls = cls({
-      [`${cssClasses.PREFIX}-range-input-separator`]: true,
-      [`${cssClasses.PREFIX}-range-input-separator-active`]: (rangeStart || rangeEnd) && !disabled,
+    onMounted(() => {
+      foundation.init();
     });
-    return (
-      <span onClick={e => !disabled && handleRangeStartFocus(e)} class={separatorCls}>
-                {rangeSeparator}
-            </span>
-    );
-  }
 
-  function renderRangeClearBtn(rangeStart: string, rangeEnd: string) {
-    const { showClear, prefixCls, disabled, clearIcon, showClearIgnoreDisabled } = props;
-    const isRealDisabled = disabled && !showClearIgnoreDisabled;
-    const allowClear = (rangeStart || rangeEnd) && showClear && !isRealDisabled;
-    return allowClear ? (
-      <div
-        role="button"
-        tabindex={0}
-        aria-label="Clear range input value"
-        class={`${prefixCls}-range-input-clearbtn`}
-        onMousedown={e => handleRangeInputClear(e)}>
-      {clearIcon ? clearIcon : <IconClear aria-hidden/>}
-      </div>
-    ) : null;
-  }
-
-  function renderRangeSuffix(suffix: VNode) {
-    const {prefixCls, disabled, rangeInputFocus} = props;
-    const rangeSuffix = suffix ? (
-      <div
-        class={`${prefixCls}-range-input-suffix`}
-        onClick={e => !disabled && !rangeInputFocus && handleRangeStartFocus(e)}
-      >
-        {suffix}
-      </div>
-    ) : null;
-    return rangeSuffix;
-  }
-
-  function renderRangeInput(rangeProps: DateInputProps) {
-    const {
-      // this.props
-      placeholder,
-      inputStyle,
-      disabled,
-      inputReadOnly,
-      autofocus,
-      size,
-      // compute props
-      text,
-      suffix,
-      inputCls,
-      // range only props
-      rangeInputStartRef,
-      rangeInputEndRef,
-      rangeInputFocus,
-      prefixCls,
-      rangeSeparator,
-      borderless
-    } = rangeProps;
-
-    const [rangeStart, rangeEnd = ''] = text.split(rangeSeparator) || [];
-    const rangeSize = size === 'large' ? 'default' : 'small';
-    const rangePlaceholder = Array.isArray(placeholder) ? placeholder : [placeholder, placeholder];
-    const [rangeStartPlaceholder, rangeEndPlaceholder] = rangePlaceholder;
-    const inputLeftWrapperCls = cls(`${prefixCls}-range-input-wrapper-start`, `${prefixCls}-range-input-wrapper`, {
-      [`${prefixCls}-range-input-wrapper-active`]: rangeInputFocus === 'rangeStart' && !disabled,
-      [`${prefixCls}-range-input-wrapper-start-with-prefix`]: props.prefix || props.insetLabel,
-      [`${prefixCls}-borderless`]: borderless
+    onUnmounted(() => {
+      foundation.destroy();
     });
-    const inputRightWrapperCls = cls(`${prefixCls}-range-input-wrapper-end`, `${prefixCls}-range-input-wrapper`, {
-      [`${prefixCls}-range-input-wrapper-active`]: rangeInputFocus === 'rangeEnd' && !disabled,
-      [`${prefixCls}-borderless`]: borderless
-    });
-    return (
-      <Fragment>
-        {renderRangePrefix()}
+    const foundation: DateInputFoundation = new DateInputFoundation(adapter());
+
+    function formatText(value: ValueType) {
+      // eslint-disable-next-line max-len
+      return value && (value as BaseValueType[]).length ? foundation.formatShowText(value as BaseValueType[]) : '';
+    }
+
+    const handleChange = (value: string, e: any) => foundation.handleChange(value, e);
+
+    const handleEnterPress = (e: KeyboardEvent) => foundation.handleInputComplete(e);
+
+    const handleInputClear = (e: MouseEvent) => foundation.handleInputClear(e);
+
+    const handleRangeInputChange = (rangeStart: string, rangeEnd: string, e: any) => {
+      const rangeInputValue = getRangeInputValue(rangeStart, rangeEnd);
+      foundation.handleChange(rangeInputValue, e);
+    };
+
+    const handleRangeInputClear: any = (e) => {
+      foundation.handleRangeInputClear(e);
+    };
+
+    const handleRangeInputEnterPress = (e: KeyboardEvent, rangeStart: string, rangeEnd: string) => {
+      const rangeInputValue = getRangeInputValue(rangeStart, rangeEnd);
+      foundation.handleRangeInputEnterPress(e, rangeInputValue);
+    };
+
+    const handleRangeInputEndKeyPress = (e: KeyboardEvent) => {
+      foundation.handleRangeInputEndKeyPress(e);
+    };
+
+    const handleRangeInputFocus = (e: MouseEvent, rangeType: RangeType) => {
+      foundation.handleRangeInputFocus(e, rangeType);
+    };
+
+    const handleRangeStartFocus: any = (e) => {
+      handleRangeInputFocus(e, 'rangeStart');
+    };
+
+    const handleInsetInputChange = (options: InsetInputChangeFoundationProps) => {
+      foundation.handleInsetInputChange(options);
+    };
+
+    const getRangeInputValue = (rangeStart: string, rangeEnd: string) => {
+      const { rangeSeparator } = props;
+      const rangeInputValue = `${rangeStart}${rangeSeparator}${rangeEnd}`;
+      return rangeInputValue;
+    };
+
+    function renderRangePrefix() {
+      const { prefix, insetLabel, prefixCls, disabled, rangeInputFocus } = props;
+      const labelNode = prefix || insetLabel;
+      return labelNode ? (
         <div
-          onClick={e => !disabled && handleRangeInputFocus(e, 'rangeStart')}
-          class={`${inputCls} ${inputLeftWrapperCls}`}
+          class={`${prefixCls}-range-input-prefix`}
+          onClick={(e) => !disabled && !rangeInputFocus && handleRangeStartFocus(e)}
+          x-semi-prop="prefix,insetLabel"
         >
-          <Input
-            borderless={borderless}
-            size={rangeSize}
-            style={inputStyle as CSSProperties}
-            disabled={disabled}
-            readonly={inputReadOnly}
-            placeholder={rangeStartPlaceholder}
-            value={rangeStart}
-            // range input onBlur function is called when panel is closed
-            // onBlur={noop}
-            onChange={(rangeStartValue, e) => handleRangeInputChange(rangeStartValue, rangeEnd, e)}
-            onEnterPress={e => handleRangeInputEnterPress(e, rangeStart, rangeEnd)}
-            onFocus={e => handleRangeInputFocus(e as any, 'rangeStart')}
-            autoFocus={autofocus} // autofocus moved to range start
-            forwardRef={rangeInputStartRef}
-          />
+          {labelNode}
         </div>
-        {renderRangeSeparator(rangeStart, rangeEnd)}
+      ) : null;
+    }
+
+    function renderRangeSeparator(rangeStart: string, rangeEnd: string) {
+      const { disabled, rangeSeparator } = props;
+      const separatorCls = cls({
+        [`${cssClasses.PREFIX}-range-input-separator`]: true,
+        [`${cssClasses.PREFIX}-range-input-separator-active`]: (rangeStart || rangeEnd) && !disabled,
+      });
+      return (
+        <span onClick={(e) => !disabled && handleRangeStartFocus(e)} class={separatorCls}>
+          {rangeSeparator}
+        </span>
+      );
+    }
+
+    function renderRangeClearBtn(rangeStart: string, rangeEnd: string) {
+      const { showClear, prefixCls, disabled, clearIcon, showClearIgnoreDisabled } = props;
+      const isRealDisabled = disabled && !showClearIgnoreDisabled;
+      const allowClear = (rangeStart || rangeEnd) && showClear && !isRealDisabled;
+      return allowClear ? (
         <div
-          class={`${inputCls} ${inputRightWrapperCls}`}
-          onClick={e => !disabled && handleRangeInputFocus(e, 'rangeEnd')}
+          role="button"
+          tabindex={0}
+          aria-label="Clear range input value"
+          class={`${prefixCls}-range-input-clearbtn`}
+          onMousedown={(e) => handleRangeInputClear(e)}
         >
-          <Input
-            borderless={borderless}
-            size={rangeSize}
-            style={inputStyle as CSSProperties}
-            disabled={disabled}
-            readonly={inputReadOnly}
-            placeholder={rangeEndPlaceholder}
-            value={rangeEnd}
-            // range input onBlur function is called when panel is closed
-            // onBlur={noop}
-            onChange={(rangeEndValue, e) => handleRangeInputChange(rangeStart, rangeEndValue, e)}
-            onEnterPress={e => handleRangeInputEnterPress(e, rangeStart, rangeEnd)}
-            onFocus={e => handleRangeInputFocus(e as any, 'rangeEnd')}
-            onKeydown={handleRangeInputEndKeyPress} // only monitor tab button on range end
-            forwardRef={rangeInputEndRef}
-          />
+          {clearIcon ? clearIcon : <IconClear aria-hidden />}
         </div>
-        {renderRangeClearBtn(rangeStart, rangeEnd)}
-        {renderRangeSuffix(suffix)}
-      </Fragment>
-    );
-  }
+      ) : null;
+    }
 
-  function isRenderMultipleInputs() {
-    const {type} = props;
-    // isRange and not monthRange render multiple inputs
-    return type.includes('Range') && type !== 'monthRange';
-  }
+    function renderRangeSuffix(suffix: VNode) {
+      const { prefixCls, disabled, rangeInputFocus } = props;
+      const rangeSuffix = suffix ? (
+        <div
+          class={`${prefixCls}-range-input-suffix`}
+          onClick={(e) => !disabled && !rangeInputFocus && handleRangeStartFocus(e)}
+        >
+          {suffix}
+        </div>
+      ) : null;
+      return rangeSuffix;
+    }
 
-  function renderInputInset() {
-    const {
-      type,
-      handleInsetDateFocus,
-      handleInsetTimeFocus,
-      value,
-      insetInputValue,
-      prefixCls,
-      rangeInputStartRef,
-      rangeInputEndRef,
-      density,
-      insetInput,
-    } = props;
+    function renderRangeInput(rangeProps: DateInputProps) {
+      const {
+        // this.props
+        placeholder,
+        inputStyle,
+        disabled,
+        inputReadOnly,
+        autofocus,
+        size,
+        // compute props
+        text,
+        suffix,
+        inputCls,
+        // range only props
+        rangeInputStartRef,
+        rangeInputEndRef,
+        rangeInputFocus,
+        prefixCls,
+        rangeSeparator,
+        borderless,
+      } = rangeProps;
 
-    const newInsetInputValue = foundation.getInsetInputValue({value, insetInputValue});
-    const {
-      dateStart,
-      dateEnd,
-      timeStart,
-      timeEnd
-    } = get(insetInput, 'placeholder', {}) as InsetInputProps['placeholder'];
-    const {datePlaceholder, timePlaceholder} = foundation.getInsetInputPlaceholder();
-
-    const insetInputWrapperCls = `${prefixCls}-inset-input-wrapper`;
-    const separatorCls = `${prefixCls}-inset-input-separator`;
-
-    return (
-      <div class={insetInputWrapperCls} x-type={type}>
-        <InsetDateInput
-          forwardRef={rangeInputStartRef}
-          insetInputValue={newInsetInputValue}
-          placeholder={dateStart ?? datePlaceholder}
-          valuePath={'monthLeft.dateInput'}
-          onChange={handleInsetInputChange}
-          onFocus={e => handleInsetDateFocus(e, 'rangeStart')}
-        />
-        <InsetTimeInput
-          disabled={!newInsetInputValue.monthLeft.dateInput}
-          insetInputValue={newInsetInputValue}
-          placeholder={timeStart ?? timePlaceholder}
-          type={type}
-          valuePath={'monthLeft.timeInput'}
-          onChange={handleInsetInputChange}
-          onFocus={handleInsetTimeFocus}
-        />
-        {isRenderMultipleInputs() && (
-          <>
-            <div class={separatorCls}>{density === 'compact' ? null : '-'}</div>
-            <InsetDateInput
+      const [rangeStart, rangeEnd = ''] = text.split(rangeSeparator) || [];
+      const rangeSize = size === 'large' ? 'default' : 'small';
+      const rangePlaceholder = Array.isArray(placeholder) ? placeholder : [placeholder, placeholder];
+      const [rangeStartPlaceholder, rangeEndPlaceholder] = rangePlaceholder;
+      const inputLeftWrapperCls = cls(`${prefixCls}-range-input-wrapper-start`, `${prefixCls}-range-input-wrapper`, {
+        [`${prefixCls}-range-input-wrapper-active`]: rangeInputFocus === 'rangeStart' && !disabled,
+        [`${prefixCls}-range-input-wrapper-start-with-prefix`]: props.prefix || props.insetLabel,
+        [`${prefixCls}-borderless`]: borderless,
+      });
+      const inputRightWrapperCls = cls(`${prefixCls}-range-input-wrapper-end`, `${prefixCls}-range-input-wrapper`, {
+        [`${prefixCls}-range-input-wrapper-active`]: rangeInputFocus === 'rangeEnd' && !disabled,
+        [`${prefixCls}-borderless`]: borderless,
+      });
+      return (
+        <Fragment>
+          {renderRangePrefix()}
+          <div
+            onClick={(e) => !disabled && handleRangeInputFocus(e, 'rangeStart')}
+            class={`${inputCls} ${inputLeftWrapperCls}`}
+          >
+            <Input
+              borderless={borderless}
+              size={rangeSize}
+              style={inputStyle as CSSProperties}
+              disabled={disabled}
+              readonly={inputReadOnly}
+              placeholder={rangeStartPlaceholder}
+              value={rangeStart}
+              // range input onBlur function is called when panel is closed
+              // onBlur={noop}
+              onChange={(rangeStartValue, e) => handleRangeInputChange(rangeStartValue, rangeEnd, e)}
+              onEnterPress={(e) => handleRangeInputEnterPress(e, rangeStart, rangeEnd)}
+              onFocus={(e) => handleRangeInputFocus(e as any, 'rangeStart')}
+              autoFocus={autofocus} // autofocus moved to range start
+              forwardRef={rangeInputStartRef}
+            />
+          </div>
+          {renderRangeSeparator(rangeStart, rangeEnd)}
+          <div
+            class={`${inputCls} ${inputRightWrapperCls}`}
+            onClick={(e) => !disabled && handleRangeInputFocus(e, 'rangeEnd')}
+          >
+            <Input
+              borderless={borderless}
+              size={rangeSize}
+              style={inputStyle as CSSProperties}
+              disabled={disabled}
+              readonly={inputReadOnly}
+              placeholder={rangeEndPlaceholder}
+              value={rangeEnd}
+              // range input onBlur function is called when panel is closed
+              // onBlur={noop}
+              onChange={(rangeEndValue, e) => handleRangeInputChange(rangeStart, rangeEndValue, e)}
+              onEnterPress={(e) => handleRangeInputEnterPress(e, rangeStart, rangeEnd)}
+              onFocus={(e) => handleRangeInputFocus(e as any, 'rangeEnd')}
+              onKeyDown={handleRangeInputEndKeyPress} // only monitor tab button on range end
               forwardRef={rangeInputEndRef}
-              insetInputValue={newInsetInputValue}
-              placeholder={dateEnd ?? datePlaceholder}
-              valuePath={'monthRight.dateInput'}
-              onChange={handleInsetInputChange}
-              onFocus={e => handleInsetDateFocus(e, 'rangeEnd')}
             />
-            <InsetTimeInput
-              disabled={!newInsetInputValue.monthRight.dateInput}
-              insetInputValue={newInsetInputValue}
-              placeholder={timeEnd ?? timePlaceholder}
-              type={type}
-              valuePath={'monthRight.timeInput'}
-              onChange={handleInsetInputChange}
-              onFocus={handleInsetTimeFocus}
-            />
-          </>
-        )}
-      </div>
-    );
-  }
-
-  function renderTriggerInput() {
-    const {
-      placeholder,
-      type,
-      value,
-      inputValue,
-      inputStyle,
-      disabled,
-      showClear,
-      inputReadOnly,
-      insetLabel,
-      validateStatus,
-      block,
-      prefixCls,
-      multiple, // Whether to allow multiple values for email and file types
-      dateFnsLocale, // No need to pass to input
-      onBlur,
-      onClear,
-      onFocus,
-      prefix,
-      autofocus,
-      size,
-      inputRef,
-      // range input support props, no need passing to not range type
-      rangeInputStartRef,
-      rangeInputEndRef,
-      onRangeClear,
-      onRangeBlur,
-      onRangeEndTabPress,
-      rangeInputFocus,
-      rangeSeparator,
-      insetInput,
-      insetInputValue,
-      defaultPickerValue,
-      showClearIgnoreDisabled,
-      ...rest
-    } = props;
-    const dateIcon = <IconCalendar aria-hidden/>;
-    const dateTimeIcon = <IconCalendarClock aria-hidden/>;
-    const suffix = type.includes('Time') ? dateTimeIcon : dateIcon;
-    let text = '';
-
-    if (!isNullOrUndefined(inputValue)) {
-      text = inputValue;
-    } else if (value) {
-      text = formatText(value);
+          </div>
+          {renderRangeClearBtn(rangeStart, rangeEnd)}
+          {renderRangeSuffix(suffix)}
+        </Fragment>
+      );
     }
 
-    const inputCls = cls({
-      [`${prefixCls}-input-readonly`]: inputReadOnly,
-      [`${prefixCls}-monthRange-input`]: type === 'monthRange',
-    });
-
-    const rangeProps = {...props, text, suffix, inputCls};
-
-    const inputProps = {
-      ...rest,
-      inputRef,
-      insetLabel: insetLabel,
-      disabled: disabled,
-      showClearIgnoreDisabled: showClearIgnoreDisabled,
-      readonly: inputReadOnly,
-      className: inputCls,
-      style: inputStyle as CSSProperties,
-      hideSuffix: showClear,
-      placeholder: type === 'monthRange' && Array.isArray(placeholder) ? placeholder[0] + rangeSeparator + placeholder[1] : placeholder,
-      onEnterPress: handleEnterPress,
-      onChange: handleChange,
-      onClear: handleInputClear,
-      suffix: suffix,
-      showClear: showClear,
-      value: text,
-      validateStatus: validateStatus,
-      prefix: prefix,
-      autoFocus: autofocus,
-      size: size,
-      onBlur: onBlur as any,
-      onFocus: onFocus as any,
+    function isRenderMultipleInputs() {
+      const { type } = props;
+      // isRange and not monthRange render multiple inputs
+      return type.includes('Range') && type !== 'monthRange';
     }
-    return isRenderMultipleInputs() ? (
-      renderRangeInput(rangeProps)
-    ) : (
-      <Input
-        {...inputProps}
-      />
-    );
-  }
 
-  return () => {
-    const {insetInput} = props;
-    return insetInput ? renderInputInset() : renderTriggerInput();
-  }
-}, {
-  props: vuePropsType,
-  name: "dateInput"
-})
+    function renderInputInset() {
+      const {
+        type,
+        handleInsetDateFocus,
+        handleInsetTimeFocus,
+        value,
+        insetInputValue,
+        prefixCls,
+        rangeInputStartRef,
+        rangeInputEndRef,
+        density,
+        insetInput,
+      } = props;
 
+      const newInsetInputValue = foundation.getInsetInputValue({ value, insetInputValue });
+      const { dateStart, dateEnd, timeStart, timeEnd } = get(
+        insetInput,
+        'placeholder',
+        {}
+      ) as InsetInputProps['placeholder'];
+      const { datePlaceholder, timePlaceholder } = foundation.getInsetInputPlaceholder();
 
+      const insetInputWrapperCls = `${prefixCls}-inset-input-wrapper`;
+      const separatorCls = `${prefixCls}-inset-input-separator`;
 
-export default dateInput
+      return (
+        <div class={insetInputWrapperCls} x-type={type}>
+          <InsetDateInput
+            forwardRef={rangeInputStartRef}
+            insetInputValue={newInsetInputValue}
+            placeholder={dateStart ?? datePlaceholder}
+            valuePath={'monthLeft.dateInput'}
+            onChange={handleInsetInputChange}
+            onFocus={(e) => handleInsetDateFocus(e, 'rangeStart')}
+          />
+          <InsetTimeInput
+            disabled={!newInsetInputValue.monthLeft.dateInput}
+            insetInputValue={newInsetInputValue}
+            placeholder={timeStart ?? timePlaceholder}
+            type={type}
+            valuePath={'monthLeft.timeInput'}
+            onChange={handleInsetInputChange}
+            onFocus={handleInsetTimeFocus}
+          />
+          {isRenderMultipleInputs() && (
+            <>
+              <div class={separatorCls}>{density === 'compact' ? null : '-'}</div>
+              <InsetDateInput
+                forwardRef={rangeInputEndRef}
+                insetInputValue={newInsetInputValue}
+                placeholder={dateEnd ?? datePlaceholder}
+                valuePath={'monthRight.dateInput'}
+                onChange={handleInsetInputChange}
+                onFocus={(e) => handleInsetDateFocus(e, 'rangeEnd')}
+              />
+              <InsetTimeInput
+                disabled={!newInsetInputValue.monthRight.dateInput}
+                insetInputValue={newInsetInputValue}
+                placeholder={timeEnd ?? timePlaceholder}
+                type={type}
+                valuePath={'monthRight.timeInput'}
+                onChange={handleInsetInputChange}
+                onFocus={handleInsetTimeFocus}
+              />
+            </>
+          )}
+        </div>
+      );
+    }
 
+    function renderTriggerInput() {
+      const {
+        placeholder,
+        type,
+        value,
+        inputValue,
+        inputStyle,
+        disabled,
+        showClear,
+        inputReadOnly,
+        insetLabel,
+        validateStatus,
+        block,
+        prefixCls,
+        multiple, // Whether to allow multiple values for email and file types
+        dateFnsLocale, // No need to pass to input
+        onBlur,
+        onClear,
+        onFocus,
+        prefix,
+        autofocus,
+        size,
+        inputRef,
+        // range input support props, no need passing to not range type
+        rangeInputStartRef,
+        rangeInputEndRef,
+        onRangeClear,
+        onRangeBlur,
+        onRangeEndTabPress,
+        rangeInputFocus,
+        rangeSeparator,
+        insetInput,
+        insetInputValue,
+        defaultPickerValue,
+        showClearIgnoreDisabled,
+        ...rest
+      } = props as DateInputProps;
+      const dateIcon = <IconCalendar aria-hidden />;
+      const dateTimeIcon = <IconCalendarClock aria-hidden />;
+      const suffix = type.includes('Time') ? dateTimeIcon : dateIcon;
+      let text = '';
+
+      if (!isNullOrUndefined(inputValue)) {
+        text = inputValue;
+      } else if (value) {
+        text = formatText(value);
+      }
+
+      const inputCls = cls({
+        [`${prefixCls}-input-readonly`]: inputReadOnly,
+        [`${prefixCls}-monthRange-input`]: type === 'monthRange',
+      });
+
+      const rangeProps = { ...props, text, suffix, inputCls };
+
+      const inputProps = {
+        ...rest,
+        inputRef,
+        insetLabel: insetLabel,
+        disabled: disabled,
+        showClearIgnoreDisabled: showClearIgnoreDisabled,
+        readonly: inputReadOnly,
+        className: inputCls,
+        style: inputStyle as CSSProperties,
+        hideSuffix: showClear,
+        placeholder:
+          type === 'monthRange' && Array.isArray(placeholder)
+            ? placeholder[0] + rangeSeparator + placeholder[1]
+            : placeholder,
+        onEnterPress: handleEnterPress,
+        onChange: handleChange,
+        onClear: handleInputClear,
+        suffix: suffix,
+        showClear: showClear,
+        value: text,
+        validateStatus: validateStatus,
+        prefix: prefix,
+        autoFocus: autofocus,
+        size: size,
+        onBlur: onBlur as any,
+        onFocus: onFocus as any,
+      };
+      return isRenderMultipleInputs() ? renderRangeInput(rangeProps) : <Input {...inputProps} />;
+    }
+
+    return () => {
+      const { insetInput } = props;
+      return insetInput ? renderInputInset() : renderTriggerInput();
+    };
+  },
+});
+
+export default dateInput;

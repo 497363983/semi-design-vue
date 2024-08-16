@@ -2,12 +2,6 @@ import {
   defineComponent,
   ref,
   h,
-  Fragment,
-  VNode,
-  CSSProperties,
-  inject,
-  Ref,
-  watch,
   getCurrentInstance,
   ComponentObjectPropsOptions, PropType
 } from 'vue'
@@ -27,6 +21,7 @@ import {vuePropsMake} from "../PropTypes";
 import {useConfigContext} from "../configProvider/context/Consumer";
 import type { ArrowProps } from './Arrow';
 import isNullOrUndefined from '@douyinfe/semi-foundation/utils/isNullOrUndefined';
+import { CombineProps } from '../interface';
 export type { ArrowProps };
 export declare interface ArrowStyle {
   borderColor?: string;
@@ -80,8 +75,7 @@ export interface PopoverState {
 const positionSet = strings.POSITION_SET;
 const triggerSet = strings.TRIGGER_SET;
 
-const propTypes:ComponentObjectPropsOptions<PopoverProps> = {
-
+const propTypes:CombineProps<PopoverProps> = {
   // children: PropTypes.node,
   content: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   visible: PropTypes.bool,
@@ -123,6 +117,11 @@ const propTypes:ComponentObjectPropsOptions<PopoverProps> = {
   afterClose: Function as PropType<PopoverProps['afterClose']>,
   disableFocusListener: Boolean,
   keepDOM: Boolean,
+  margin: [PropTypes.number, PropTypes.object],
+  closeOnEsc: Boolean,
+  returnFocusOnClose: Boolean,
+  onEscKeyDown: Function as PropType<PopoverProps['onEscKeyDown']>,
+  clickToHide: Boolean,
 };
 
 const defaultProps = {
@@ -143,9 +142,12 @@ const defaultProps = {
   guardFocus: true,
   disableFocusListener: true,
 };
-export const vuePropsType = vuePropsMake<PopoverProps>(propTypes, defaultProps)
+export const vuePropsType = vuePropsMake(propTypes, defaultProps)
 
-const Popover = defineComponent<PopoverProps>((props, {slots, expose}) => {
+const Popover = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Popover',
+  setup(props, {slots, expose}) {
   const {context} = useConfigContext()
   const tooltipRef = ref()
 
@@ -243,9 +245,7 @@ const Popover = defineComponent<PopoverProps>((props, {slots, expose}) => {
       </Tooltip>
     );
   }
-}, {
-  props: vuePropsType,
-  name: 'Popover'
+}
 })
 
 

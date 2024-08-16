@@ -1,9 +1,9 @@
 import {defineComponent, ref, h, Fragment, useSlots, onMounted} from 'vue'
 import Transfer from "../index";
 import {IconClose} from "@kousum/semi-icons-vue";
-import {Avatar} from "../../index";
 import {Checkbox} from "../../checkbox";
 import TransferTreeDemo from "./TransferTreeDemo";
+import Avatar from '../../avatar';
 
 interface TransferDemoProps {
   name?: string
@@ -12,7 +12,7 @@ interface TransferDemoProps {
 export const vuePropsType = {
   name: String
 }
-const TransferDemo = defineComponent<TransferDemoProps>((props, {}) => {
+const TransferDemo = defineComponent((props, {}) => {
   const slots = useSlots()
   const data = Array.from({ length: 100 }, (v, i) => {
     return {

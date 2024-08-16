@@ -5,7 +5,7 @@ import { TabContextValue } from '../interface';
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:TabContextValue}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = ref<TabContextValue>();
 
   watch(()=>props.value, ()=>{
@@ -14,7 +14,7 @@ const Provider = defineComponent<{value:TabContextValue}>((props, {slots}) => {
   provide('TabsContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'TabsContextProvider'
 })
 

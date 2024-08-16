@@ -11,7 +11,7 @@ interface ModalDemoConfirmProps {
 export const vuePropsType = {
   name: String
 }
-const ModalDemoConfirm = defineComponent<ModalDemoConfirmProps>((props, {}) => {
+const ModalDemoConfirm = defineComponent((props, {}) => {
   const [modal, contextHolder] = useModal();
   const config = { title: 'This is a success message', content: 'Context consumer' };
 
@@ -38,7 +38,7 @@ const ModalDemoConfirm = defineComponent<ModalDemoConfirmProps>((props, {}) => {
     </div>
   )
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'ModalDemoConfirm'
 })
 

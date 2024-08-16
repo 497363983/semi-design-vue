@@ -3,8 +3,8 @@ import DropdownMenu from "../dropdownMenu";
 import DropdownItem from "../dropdownItem";
 import DropdownDivider from "../dropdownDivider";
 import Dropdown from "../index";
-import {Button} from "../../index";
 import {IconMore} from "@kousum/semi-icons-vue";
+import Button from '../../button';
 
 interface ExampleProps {
   name?: string
@@ -13,7 +13,7 @@ interface ExampleProps {
 export const vuePropsType = {
   name: String
 }
-const DropdownDemo1 = defineComponent<ExampleProps>((props, {slots}) => {
+const DropdownDemo1 = defineComponent((props, {slots}) => {
   // 在keep-alive = true时  相当于 onShow
   onActivated(() => {
 

@@ -48,6 +48,7 @@ import type {
 import type { ValidateStatus } from '../_base/baseComponent';
 import { vuePropsMake } from '../PropTypes';
 import { styleNum } from '../_utils';
+import { CombineProps } from '../interface';
 
 const prefixCls = cssClasses.PREFIX;
 
@@ -144,9 +145,12 @@ export interface UploadState {
   replaceInputKey: number;
 }
 
-const propTypes: ComponentObjectPropsOptions<UploadProps> = {
+const propTypes: CombineProps<UploadProps> = {
   accept: PropTypes.string, // Limit allowed file types
-  action: String,
+  action: {
+    type: String,
+    required: true,
+  },
   addOnPasting: PropTypes.bool,
   afterUpload: PropTypes.func as PropType<UploadProps['afterUpload']>,
   beforeClear: PropTypes.func as PropType<UploadProps['beforeClear']>,
@@ -211,6 +215,7 @@ const propTypes: ComponentObjectPropsOptions<UploadProps> = {
   validateMessage: PropTypes.node as PropType<UploadProps['validateMessage']>,
   validateStatus: String as PropType<UploadProps['validateStatus']>,
   withCredentials: PropTypes.bool,
+  capture: [PropTypes.bool, PropTypes.string] as PropType<UploadProps['capture']>,
 };
 const defaultProps: Partial<UploadProps> = {
   defaultFileList: [],
@@ -244,8 +249,10 @@ const defaultProps: Partial<UploadProps> = {
   withCredentials: false,
 };
 export const vuePropsType = vuePropsMake(propTypes, defaultProps);
-const Upload = defineComponent<UploadProps>(
-  (props, { expose }) => {
+const Upload = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Upload',
+  setup(props, { expose }) {
     const slots = useSlots();
 
     const state = reactive<UploadState>({
@@ -325,12 +332,12 @@ const Upload = defineComponent<UploadProps>(
     const foundation = new UploadFoundation(adapter);
 
     /**
-     * Notes:
-     *   The input parameter and return value here do not declare the type, otherwise tsc may report an error in form/fields.tsx when wrap after withField
-     *   `The types of the parameters "props" and "nextProps" are incompatible.
-     The attribute "action" is missing in the type "Readonly<any>", but it is required in the type "UploadProps".`
-     *   which seems to be a bug, remove props type declare here
-     */
+   * Notes:
+   *   The input parameter and return value here do not declare the type, otherwise tsc may report an error in form/fields.tsx when wrap after withField
+   *   `The types of the parameters "props" and "nextProps" are incompatible.
+   The attribute "action" is missing in the type "Readonly<any>", but it is required in the type "UploadProps".`
+   *   which seems to be a bug, remove props type declare here
+   */
     function getDerivedStateFromProps(props) {
       const { fileList } = props;
       if ('fileList' in props) {
@@ -401,7 +408,7 @@ const Upload = defineComponent<UploadProps>(
      * @param index number
      * @returns
      */
-    const insert = (files: Array<CustomFile>, index: number): void => {
+    const insert = (files: Array<CustomFile>, index?: number): void => {
       return foundation.insertFileToList(files, index);
     };
 
@@ -442,7 +449,7 @@ const Upload = defineComponent<UploadProps>(
       const onReplace = (): void => {
         replace(index);
       };
-      const fileCardProps:FileCardProps = {
+      const fileCardProps: FileCardProps = {
         ...pick(props, ['showRetry', 'showReplace', '']),
         ...(pick(file, [...Object.keys(vuePropsTypeFileCard)]) as FileItem),
         previewFile,
@@ -450,6 +457,7 @@ const Upload = defineComponent<UploadProps>(
         onRemove,
         onRetry,
         index,
+        //@ts-ignore
         key: uid || `${name}${index}`,
         style: itemStyle,
         disabled,
@@ -736,6 +744,7 @@ const Upload = defineComponent<UploadProps>(
             accept={accept}
             onChange={onChange}
             type="file"
+            data-testid="upload-bt"
             autocomplete="off"
             tabindex={-1}
             class={inputCls}
@@ -770,10 +779,6 @@ const Upload = defineComponent<UploadProps>(
       );
     };
   },
-  {
-    props: vuePropsType,
-    name: 'Upload',
-  }
-);
+});
 
 export default Upload;

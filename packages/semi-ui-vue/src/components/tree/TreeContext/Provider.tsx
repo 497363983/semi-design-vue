@@ -5,7 +5,7 @@ import {TreeContextValue} from "../treeContext";
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:TreeContextValue}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = ref<TreeContextValue>();
 
   watch(()=>props.value, ()=>{
@@ -14,7 +14,7 @@ const Provider = defineComponent<{value:TreeContextValue}>((props, {slots}) => {
   provide('TreeContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'TreeContextProvider'
 })
 

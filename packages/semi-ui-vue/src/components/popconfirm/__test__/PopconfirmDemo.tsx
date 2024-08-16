@@ -10,7 +10,7 @@ interface PopconfirmDemoProps {
 export const vuePropsType = {
   name: String
 }
-const PopconfirmDemo = defineComponent<PopconfirmDemoProps>((props, {}) => {
+const PopconfirmDemo = defineComponent((props, {}) => {
 
   const slots = useSlots()
   const onConfirm = () => {
@@ -28,7 +28,11 @@ const PopconfirmDemo = defineComponent<PopconfirmDemoProps>((props, {}) => {
         onConfirm={onConfirm}
         onCancel={onCancel}
       >
-        <Button className={'test'}>保存</Button>
+        <Button
+          //@ts-ignore
+          role={'bt'}
+          className={'test'}
+        >保存</Button>
       </Popconfirm>
     </div>
   )

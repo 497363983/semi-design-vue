@@ -1,7 +1,6 @@
 import {defineComponent, ref, h, Fragment, useSlots} from 'vue'
 import {Form, useFormState, withField} from "../index";
-import {Input, Select} from "../../index";
-
+import Input from '../../input';
 
 
 const MyComponent = (props) => {
@@ -46,7 +45,7 @@ interface WithFieldDemoProps {
 export const vuePropsType = {
   name: String
 }
-const WithFieldDemo = defineComponent<WithFieldDemoProps>((props, {}) => {
+const WithFieldDemo = defineComponent((props, {}) => {
 
   const slots = useSlots()
 
@@ -62,6 +61,7 @@ const WithFieldDemo = defineComponent<WithFieldDemoProps>((props, {}) => {
 
 // @ts-ignore
 WithFieldDemo.props = vuePropsType
+// @ts-ignore
 WithFieldDemo.name = 'WithFieldDemo'
 
 export default WithFieldDemo

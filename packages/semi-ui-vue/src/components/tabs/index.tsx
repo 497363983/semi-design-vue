@@ -1,6 +1,7 @@
 import cls from 'classnames';
 import * as PropTypes from '../PropTypes';
-import { cssClasses, strings } from '@douyinfe/semi-foundation/tabs/constants';
+import { vuePropsMake } from '../PropTypes';
+import { cssClasses } from '@douyinfe/semi-foundation/tabs/constants';
 import isNullOrUndefined from '@douyinfe/semi-foundation/utils/isNullOrUndefined';
 import getDataAttr from '@douyinfe/semi-foundation/utils/getDataAttr';
 import TabsFoundation, { TabsAdapter } from '@douyinfe/semi-foundation/tabs/foundation';
@@ -14,7 +15,6 @@ import TabsContext from './tabs-context';
 import type { PlainTab, TabBarProps, TabContextValue, TabsProps } from './interface';
 import {
   ComponentObjectPropsOptions,
-  computed,
   defineComponent,
   h,
   isVNode,
@@ -26,10 +26,8 @@ import {
   VNode,
   watch,
 } from 'vue';
-import { vuePropsMake } from '../PropTypes';
 import { useBaseComponent } from '../_base/baseComponent';
-import { AutoCompleteProps } from '../autoComplete';
-import { VueJsxNode } from '../interface';
+import { CombineProps, VueJsxNode } from '../interface';
 import { getFragmentChildren } from '../_utils';
 
 const panePickKeys = ['className', 'style', 'disabled', 'itemKey', 'tab', 'icon'];
@@ -43,7 +41,7 @@ export interface TabsState {
   forceDisableMotion: boolean;
 }
 
-const propTypes: ComponentObjectPropsOptions<TabsProps> = {
+const propTypes: CombineProps<TabsProps> = {
   activeKey: PropTypes.string,
   className: PropTypes.string,
   collapsible: PropTypes.bool,
@@ -54,6 +52,7 @@ const propTypes: ComponentObjectPropsOptions<TabsProps> = {
   onChange: PropTypes.func as PropType<TabsProps['onChange']>,
   onTabClick: PropTypes.func as PropType<TabsProps['onTabClick']>,
   renderTabBar: PropTypes.func as PropType<TabsProps['renderTabBar']>,
+  showRestInDropdown: PropTypes.bool,
   size: PropTypes.string as PropType<TabsProps['size']>,
   style: PropTypes.object,
   tabBarClassName: PropTypes.string,
@@ -66,10 +65,14 @@ const propTypes: ComponentObjectPropsOptions<TabsProps> = {
   onTabClose: PropTypes.func as PropType<TabsProps['onTabClose']>,
   preventScroll: PropTypes.bool,
   more: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+  arrowPosition: PropTypes.string as PropType<TabsProps['arrowPosition']>,
+  renderArrow: PropTypes.func as PropType<TabsProps['renderArrow']>,
+  onVisibleTabsChange: PropTypes.func as PropType<TabsProps['onVisibleTabsChange']>,
+  visibleTabsStyle: PropTypes.object,
 };
 
-const defaultProps = {
-  children: [],
+const defaultProps: TabsProps = {
+  // children: [],
   collapsible: false,
   keepDOM: true,
   lazyRender: false,
@@ -80,10 +83,14 @@ const defaultProps = {
   tabPosition: 'top',
   type: 'line',
   onTabClose: () => undefined,
+  showRestInDropdown: true,
+  arrowPosition: 'both',
 };
 export const vuePropsType = vuePropsMake(propTypes, defaultProps);
-const Tabs = defineComponent<TabsProps>(
-  (props, {}) => {
+const Tabs = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Tabs',
+  setup(props, {}) {
     const slots = useSlots();
     const contentRef = ref();
     let contentHeight: string = 'auto';
@@ -212,7 +219,7 @@ const Tabs = defineComponent<TabsProps>(
     };
 
     function getPanes(): PlainTab[] {
-      const { tabList, children } = props;
+      const { tabList } = props;
       if (Array.isArray(tabList) && tabList.length) {
         return tabList;
       }
@@ -286,6 +293,7 @@ const Tabs = defineComponent<TabsProps>(
         keepDOM,
         lazyRender,
         renderTabBar,
+        showRestInDropdown,
         size,
         style,
         tabBarClassName,
@@ -295,6 +303,10 @@ const Tabs = defineComponent<TabsProps>(
         tabPosition,
         type,
         more,
+        onVisibleTabsChange,
+        visibleTabsStyle,
+        arrowPosition,
+        renderArrow,
         ...restProps
       } = props;
       const { panes, activeKey } = state;
@@ -314,6 +326,7 @@ const Tabs = defineComponent<TabsProps>(
         collapsible,
         list: panes as any,
         onTabClick: onTabClick,
+        showRestInDropdown,
         size,
         style: tabBarStyle,
         tabBarExtraContent,
@@ -322,6 +335,10 @@ const Tabs = defineComponent<TabsProps>(
         deleteTabItem: deleteTabItem,
         handleKeyDown: foundation.handleKeyDown,
         more,
+        onVisibleTabsChange,
+        visibleTabsStyle,
+        arrowPosition,
+        renderArrow,
       } as TabBarProps;
 
       const tabBar = renderTabBar ? renderTabBar(tabBarProps, TabBar) : <TabBar {...tabBarProps} />;
@@ -351,11 +368,7 @@ const Tabs = defineComponent<TabsProps>(
       );
     };
   },
-  {
-    props: vuePropsType,
-    name: 'Tabs',
-  }
-);
+});
 
 export default Tabs;
 

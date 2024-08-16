@@ -1,9 +1,10 @@
-import {ComponentObjectPropsOptions, CSSProperties, defineComponent, h, onMounted, PropType} from 'vue'
+import { ComponentObjectPropsOptions, CSSProperties, defineComponent, h, onMounted, PropType } from 'vue';
 import cls from 'classnames';
-import {cssClasses, strings} from '@douyinfe/semi-foundation/layout/constants';
+import { cssClasses, strings } from '@douyinfe/semi-foundation/layout/constants';
 import getDataAttr from '@douyinfe/semi-foundation/utils/getDataAttr';
-import {registerMediaQuery} from '../_utils/index';
-import {useLayoutContext} from "./context/Consumer";
+import { registerMediaQuery } from '../_utils/index';
+import { useLayoutContext } from './context/Consumer';
+import { CombineProps } from '../interface';
 
 export interface ResponsiveMap {
   xs: string;
@@ -14,7 +15,6 @@ export interface ResponsiveMap {
   xxl: string;
 }
 
-
 const responsiveMap: ResponsiveMap = {
   xs: '(max-width: 575px)',
   sm: '(min-width: 576px)',
@@ -24,7 +24,7 @@ const responsiveMap: ResponsiveMap = {
   xxl: '(min-width: 1600px)',
 };
 
-const generateId = ((): () => string => {
+const generateId = ((): (() => string) => {
   let i = 0;
   return (): string => {
     i += 1;
@@ -41,71 +41,71 @@ export interface SiderProps {
   breakpoint?: Array<keyof ResponsiveMap>;
   onBreakpoint?: (screen: keyof ResponsiveMap, match: boolean) => void;
   'aria-label'?: string;
-  'role'?: string
+  role?: string;
 }
 
-
-export const vuePropsType:ComponentObjectPropsOptions<SiderProps> = {
+export const vuePropsType: CombineProps<SiderProps> = {
   prefixCls: {
     type: String as PropType<SiderProps['prefixCls']>,
-    default: cssClasses.PREFIX
+    default: cssClasses.PREFIX,
   },
   style: [String, Object] as PropType<SiderProps['style']>,
   className: String,
   breakpoint: Array,
   // onBreakpoin: Function as PropType<SiderProps['onBreakpoin']>,
   'aria-label': String,
-  'role': String,
-}
-const Sider = defineComponent<SiderProps>((props, {slots}) => {
+  role: String,
+  onBreakpoint: Function as PropType<SiderProps['onBreakpoint']>,
+};
+const Sider = defineComponent({
+  props: { ...vuePropsType },
+  name: 'LayoutSider',
+  setup(props, { slots }) {
+    let unRegisters: Array<() => void> = [];
+    const uniqueId = generateId();
+    const { context } = useLayoutContext();
 
-  let unRegisters: Array<() => void> = [];
-  const uniqueId = generateId();
-  const {context} = useLayoutContext()
+    onMounted(() => {
+      const { breakpoint } = props;
+      const matchBpt: Array<keyof ResponsiveMap> = (Object.keys(responsiveMap) as (keyof ResponsiveMap)[]).filter(
+        (item) => breakpoint && breakpoint.indexOf(item) !== -1
+      ) as any;
+      const unRegisters_ = matchBpt.map((screen) =>
+        registerMediaQuery(responsiveMap[screen], {
+          match: () => {
+            responsiveHandler(screen, true);
+          },
+          unmatch: () => {
+            responsiveHandler(screen, false);
+          },
+        })
+      );
+      unRegisters = unRegisters_;
 
-  onMounted(()=>{
-    const { breakpoint } = props;
-    const matchBpt: Array<keyof ResponsiveMap> = (Object.keys(responsiveMap) as (keyof ResponsiveMap)[]).filter((item) => breakpoint && breakpoint.indexOf(item) !== -1) as any;
-    const unRegisters_ = matchBpt.map(screen => registerMediaQuery(responsiveMap[screen], {
-      match: () => {
-        responsiveHandler(screen, true);
-      },
-      unmatch: () => {
-        responsiveHandler(screen, false);
-      },
-    }));
-    unRegisters = unRegisters_;
-
-    if (context.value.siderHook) {
-      context.value.siderHook.addSider(uniqueId);
-    }
-  })
-
-  function responsiveHandler(screen: keyof ResponsiveMap, matches: boolean): void {
-    const { onBreakpoint } = props;
-    if (onBreakpoint) {
-      onBreakpoint(screen, matches);
-    }
-  }
-
-  return () => {
-    const { prefixCls, className, style, ...others } = props;
-    const classString = cls(className, {
-      [`${prefixCls}-sider`]: true,
+      if (context.value.siderHook) {
+        context.value.siderHook.addSider(uniqueId);
+      }
     });
-    return (
-      <aside class={classString} aria-label={props['aria-label']} style={style} {...getDataAttr(others)}>
-        <div class={`${prefixCls}-sider-children`}>
-          {slots.default?slots.default():null}
-        </div>
-      </aside>
-    );
-  }
-}, {
-  props: vuePropsType,
-  name: 'LayoutSider'
-})
 
+    function responsiveHandler(screen: keyof ResponsiveMap, matches: boolean): void {
+      const { onBreakpoint } = props;
+      if (onBreakpoint) {
+        onBreakpoint(screen, matches);
+      }
+    }
 
-export default Sider
+    return () => {
+      const { prefixCls, className, style, ...others } = props;
+      const classString = cls(className, {
+        [`${prefixCls}-sider`]: true,
+      });
+      return (
+        <aside class={classString} aria-label={props['aria-label']} style={style} {...getDataAttr(others)}>
+          <div class={`${prefixCls}-sider-children`}>{slots.default ? slots.default() : null}</div>
+        </aside>
+      );
+    };
+  },
+});
 
+export default Sider;

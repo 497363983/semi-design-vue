@@ -3,9 +3,11 @@ import Table, { TableColumn } from '../index';
 import Avatar from '../../avatar';
 import { IconMore } from '@kousum/semi-icons-vue';
 import { IllustrationNoResult, IllustrationNoResultDark } from '@kousum/semi-illustrations-vue';
-import { Button, Empty } from '../../index';
+
 import { IconDelete } from '@kousum/semi-icons-vue';
 import {TypographyText} from "../../typography"
+import Button from '../../button';
+import Empty from '../../empty';
 interface TableDemo1Props {
   name?: string;
 }
@@ -51,7 +53,7 @@ const raw = [
 export const vuePropsType = {
   name: String,
 };
-const TableDemo1 = defineComponent<TableDemo1Props>((props, {}) => {
+const TableDemo1 = defineComponent((props, {}) => {
   const slots = useSlots();
 
   const pagination = {

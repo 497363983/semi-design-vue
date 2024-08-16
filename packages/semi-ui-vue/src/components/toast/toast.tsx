@@ -22,7 +22,7 @@ import {
   VNode,
 } from 'vue';
 import { vuePropsMake } from '../PropTypes';
-import { VueJsxNode } from '../interface';
+import { CombineProps, VueJsxNode } from '../interface';
 import { useConfigContext } from '../configProvider/context/Consumer';
 import { useBaseComponent } from '../_base/baseComponent';
 
@@ -43,9 +43,12 @@ export interface ToastReactProps extends ToastProps {
   id?: string;
 }
 
-const propTypes: ComponentObjectPropsOptions<ToastReactProps> = {
+export const propTypes: CombineProps<ToastReactProps> = {
   onClose: PropTypes.func as PropType<ToastReactProps['onClose']>,
-  content: PropTypes.node,
+  content: {
+    type: PropTypes.node,
+    required: true
+  },
   close: PropTypes.func as PropType<ToastReactProps['close']>,
   duration: PropTypes.number,
   theme: String as PropType<ToastReactProps['theme']>,
@@ -62,6 +65,12 @@ const propTypes: ComponentObjectPropsOptions<ToastReactProps> = {
   icon: PropTypes.node,
   direction: String as PropType<ToastReactProps['direction']>,
   id: String as PropType<ToastReactProps['id']>,
+  top: [PropTypes.string,PropTypes.number],
+  bottom: [PropTypes.string,PropTypes.number],
+  left: [PropTypes.string,PropTypes.number],
+  right: [PropTypes.string,PropTypes.number],
+  zIndex: PropTypes.number,
+  getPopupContainer: PropTypes.func as PropType<ToastReactProps['getPopupContainer']>,
 };
 const defaultProps = {
   onClose: noop,
@@ -76,8 +85,10 @@ const defaultProps = {
 };
 
 export const vuePropsType = vuePropsMake(propTypes, defaultProps);
-const Toast = defineComponent<ToastReactProps>(
-  (props, { expose }) => {
+const Toast = defineComponent({
+  props: { ...vuePropsType },
+  name: 'Toast',
+  setup(props, { expose }) {
     const slots = useSlots();
 
     const { context } = useConfigContext();
@@ -164,9 +175,7 @@ const Toast = defineComponent<ToastReactProps>(
       const btnTheme = 'borderless';
       const btnSize = 'small';
 
-      const reservedIndex = props.positionInList
-        ? props.positionInList.length - props.positionInList.index - 1
-        : 0;
+      const reservedIndex = props.positionInList ? props.positionInList.length - props.positionInList.index - 1 : 0;
       const toastEle_ = (
         <div
           ref={toastEle}
@@ -202,8 +211,7 @@ const Toast = defineComponent<ToastReactProps>(
         </div>
       );
       if (props.stack) {
-        const height =
-          (props.stackExpanded && toastEle.value && getComputedStyle(toastEle.value).height) || 0;
+        const height = (props.stackExpanded && toastEle.value && getComputedStyle(toastEle.value).height) || 0;
         return (
           <div class={`${prefixCls}-zero-height-wrapper`} style={{ height }}>
             {toastEle_}
@@ -214,10 +222,6 @@ const Toast = defineComponent<ToastReactProps>(
       }
     };
   },
-  {
-    props: vuePropsType,
-    name: 'Toast',
-  }
-);
+});
 
 export default Toast;

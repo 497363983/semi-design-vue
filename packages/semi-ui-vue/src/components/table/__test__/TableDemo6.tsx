@@ -1,11 +1,6 @@
 import { defineComponent, ref, h, Fragment, useSlots, computed, onMounted } from 'vue';
 import {TableMaker, RowSelection, TableColumn } from '../index';
 import Avatar from '../../avatar';
-import { IconMore } from '@kousum/semi-icons-vue';
-import { IllustrationNoResult, IllustrationNoResultDark } from '@kousum/semi-illustrations-vue';
-import { Button, Empty } from '../../index';
-import { IconDelete } from '@kousum/semi-icons-vue';
-import { TypographyText } from '../../typography';
 import * as dateFns from 'date-fns';
 
 interface TableDemo1Props {
@@ -109,7 +104,7 @@ interface ColType {
   key: string;
 }
 const Table = TableMaker<ColType>();
-const TableDemo1 = defineComponent<TableDemo1Props>((props, {}) => {
+const TableDemo1 = defineComponent((props, {}) => {
   const dataSource = ref<ColType[]>([]);
   const loading = ref(false);
   const currentPage = ref(1);

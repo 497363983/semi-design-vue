@@ -5,7 +5,7 @@ import {AnchorContextType} from "../anchor-context";
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:AnchorContextType}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = ref<AnchorContextType>();
 
   watch(()=>props.value, ()=>{
@@ -14,7 +14,7 @@ const Provider = defineComponent<{value:AnchorContextType}>((props, {slots}) => 
   provide('AnchorContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'AnchorContextProvider'
 })
 

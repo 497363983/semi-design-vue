@@ -4,10 +4,11 @@ import {noop} from "lodash";
 import {numbers as popoverNumbers} from "@douyinfe/semi-foundation/popover/constants";
 import {strings} from "@douyinfe/semi-foundation/timePicker/constants";
 import {PanelShape} from "./PanelShape";
-import {ComponentObjectPropsOptions, PropType} from "vue";
-import {TimePickerProps} from "./TimePicker";
+import type {ComponentObjectPropsOptions, PropType} from "vue";
+import type {TimePickerProps} from "./TimePicker";
+import { CombineProps } from '../interface';
 
-export const timePickerPropTypes:ComponentObjectPropsOptions<TimePickerProps> = {
+export const timePickerPropTypes:CombineProps<TimePickerProps> = {
   'aria-labelledby': PropTypes.string,
   'aria-invalid': PropTypes.bool,
   'aria-errormessage': PropTypes.string,
@@ -73,4 +74,6 @@ export const timePickerPropTypes:ComponentObjectPropsOptions<TimePickerProps> = 
   clearIcon: PropTypes.node,
   dropdownMargin: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
   preventScroll: PropTypes.bool,
+  id: PropTypes.string,
+  onChangeWithDateFirst: PropTypes.bool,
 }

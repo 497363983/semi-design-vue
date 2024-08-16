@@ -1,14 +1,8 @@
-import { defineComponent, ref, h, Fragment, useSlots, computed, onMounted } from 'vue';
-import Table, {ColumnProps, Data, RowSelection, TableColumn} from '../index';
+import { computed, defineComponent } from 'vue';
+import Table, { ColumnProps, Data } from '../index';
 import Avatar from '../../avatar';
-import { IconMore } from '@kousum/semi-icons-vue';
-import { IllustrationNoResult, IllustrationNoResultDark } from '@kousum/semi-illustrations-vue';
-import { Button, Empty } from '../../index';
-import { IconDelete } from '@kousum/semi-icons-vue';
-import { TypographyText } from '../../typography';
+import { IconFilter } from '@kousum/semi-icons-vue';
 import * as dateFns from 'date-fns';
-import Tag from "../../tag";
-import {IconFilter} from "@kousum/semi-icons-vue";
 
 interface TableDemo1Props {
   name?: string;
@@ -19,7 +13,7 @@ interface TableDemo1Props {
 export const vuePropsType = {
   name: String,
 };
-const TableDemo1 = defineComponent<TableDemo1Props>((props, {}) => {
+const TableDemo1 = defineComponent((props, {}) => {
   const DAY = 24 * 60 * 60 * 1000;
   const figmaIconUrl = 'https://lf3-static.bytednsdoc.com/obj/eden-cn/ptlz_zlp/ljhwZthlaukjlkulzlp/figma-icon.png';
 

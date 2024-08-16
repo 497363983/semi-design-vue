@@ -2,11 +2,6 @@ import { defineComponent, ref, h, Fragment, useSlots, computed, onMounted } from
 import {TableMaker, ColumnProps, RowSelection, TableColumn} from '../index';
 import Avatar from '../../avatar';
 import { IconMore } from '@kousum/semi-icons-vue';
-import { IllustrationNoResult, IllustrationNoResultDark } from '@kousum/semi-illustrations-vue';
-import { Button, Empty } from '../../index';
-import { IconDelete } from '@kousum/semi-icons-vue';
-import { TypographyText } from '../../typography';
-import * as dateFns from 'date-fns';
 import Tag from "../../tag";
 
 interface TableDemo1Props {
@@ -20,7 +15,7 @@ export const vuePropsType = {
 };
 interface ColType {key: string, name: string, nameIconSrc: string, size: string, owner: string, updateTime: string, avatarBg: string}
 const Table = TableMaker<ColType>();
-const TableDemo1 = defineComponent<TableDemo1Props>((props, {}) => {
+const TableDemo1 = defineComponent((props, {}) => {
 
   const DAY = 24 * 60 * 60 * 1000;
   const figmaIconUrl = 'https://lf3-static.bytednsdoc.com/obj/eden-cn/ptlz_zlp/ljhwZthlaukjlkulzlp/figma-icon.png';

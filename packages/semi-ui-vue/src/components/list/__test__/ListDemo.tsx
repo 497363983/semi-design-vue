@@ -3,7 +3,8 @@ import List from "../index";
 import ListItem from "../item";
 import Descriptions from "../../descriptions";
 import Rating from "../../rating";
-import {Button, ButtonGroup} from "../../index";
+import ButtonGroup from '../../button/ButtonGroup';
+import Button from '../../button';
 
 interface ListDemoProps {
   name?: string
@@ -12,7 +13,7 @@ interface ListDemoProps {
 export const vuePropsType = {
   name: String
 }
-const ListDemo = defineComponent<ListDemoProps>((props, {}) => {
+const ListDemo = defineComponent((props, {}) => {
   const slots = useSlots()
   const data = [
     '从明天起，做一个幸福的人',

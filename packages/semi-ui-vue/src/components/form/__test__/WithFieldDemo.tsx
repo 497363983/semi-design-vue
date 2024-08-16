@@ -1,5 +1,5 @@
 import {defineComponent, ref, h, Fragment, useSlots} from 'vue'
-import {Form, useFormState, withField} from "../index";
+import { Form, useFormState, withField } from '../index';
 
 
 // 这里将html原生的input封装
@@ -30,7 +30,7 @@ interface WithFieldDemoProps {
 export const vuePropsType = {
   name: String
 }
-const WithFieldDemo = defineComponent<WithFieldDemoProps>((props, {}) => {
+const WithFieldDemo = defineComponent((props, {}) => {
 
   const slots = useSlots()
 

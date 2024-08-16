@@ -23,7 +23,7 @@ export interface ImageProps extends BaseProps{
     crossOrigin?: "anonymous"| "use-credentials";
     maxZoom?: number;
     minZoom?: number;
-    children?: VueJsxNode,
+    // children?: VueJsxNode,
     imageID?: number;
     setDownloadName?: (src: string) => string;
     imgStyle?: CSSProperties;
@@ -58,7 +58,7 @@ export interface PreviewProps extends BaseProps {
     viewerVisibleDelay?: number;
     disableDownload?: boolean;
     zIndex?: number;
-    children?: VueJsxNode,
+    // children?: VueJsxNode,
     crossOrigin?: "anonymous"| "use-credentials";
     maxZoom?: number;
     minZoom?: number;
@@ -187,7 +187,7 @@ export interface PreviewImageProps {
     onError?: (src: string) => void;
 }
 
-export interface ImageOffset {
+export interface ImageTranslate {
     x: number;
     y: number;
 }
@@ -196,10 +196,8 @@ export interface PreviewImageStates {
     loading: boolean;
     width: number;
     height: number;
-    offset: ImageOffset;
+    translate: ImageTranslate;
     currZoom: number;
-    top: number;
-    left: number;
 }
 
 export interface DragDirection {

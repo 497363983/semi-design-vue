@@ -9,22 +9,27 @@ import {
   reactive,
   onMounted,
   watch,
-  onUnmounted, cloneVNode, PropType
-} from 'vue'
+  onUnmounted,
+  cloneVNode,
+  PropType,
+} from 'vue';
 
-import * as PropTypes from '../PropTypes'
+import * as PropTypes from '../PropTypes';
 
 import classnames from 'classnames';
 import { checkboxGroupClasses as css, strings } from '@douyinfe/semi-foundation/checkbox/constants';
-import CheckboxGroupFoundation, { CheckboxGroupAdapter } from '@douyinfe/semi-foundation/checkbox/checkboxGroupFoundation';
-import {useBaseComponent} from '../_base/baseComponent';
+import CheckboxGroupFoundation, {
+  CheckboxGroupAdapter,
+} from '@douyinfe/semi-foundation/checkbox/checkboxGroupFoundation';
+import { useBaseComponent } from '../_base/baseComponent';
 import { Context } from './context';
 import { isEqual } from 'lodash';
 import Checkbox from './checkbox';
 import type { CheckboxEvent } from './checkbox';
-import {AriaAttributes} from "../AriaAttributes";
-import {vuePropsMake} from "../PropTypes";
-import {ComponentObjectPropsOptions} from "vue";
+import { AriaAttributes } from '../AriaAttributes';
+import { vuePropsMake } from '../PropTypes';
+import { ComponentObjectPropsOptions } from 'vue';
+import { CombineProps } from '../interface';
 
 export type CheckboxDirection = 'horizontal' | 'vertical';
 export type CheckboxType = 'default' | 'card' | 'pureCard';
@@ -54,10 +59,10 @@ export type CheckboxGroupState = {
   value?: any[];
 };
 
-const propTypes:ComponentObjectPropsOptions<CheckboxGroupProps> = {
+const propTypes: CombineProps<CheckboxGroupProps> = {
   'aria-describedby': PropTypes.string,
   'aria-errormessage': PropTypes.string,
-  'aria-invalid': PropTypes.bool,
+  'aria-invalid': [PropTypes.bool, PropTypes.string] as PropType<CheckboxGroupProps['aria-invalid']>,
   'aria-labelledby': PropTypes.string,
   'aria-required': PropTypes.bool,
   defaultValue: PropTypes.array,
@@ -84,140 +89,140 @@ const defaultProps: Partial<CheckboxGroupProps> = {
   defaultValue: [] as any,
   direction: strings.DEFAULT_DIRECTION,
 };
-export const vuePropsType = vuePropsMake<CheckboxGroupProps>(propTypes, defaultProps)
+export const vuePropsType = vuePropsMake<CheckboxGroupProps>(propTypes, defaultProps);
 
-const CheckboxGroup = defineComponent<CheckboxGroupProps>((props, {}) => {
-  const slots = useSlots()
+const CheckboxGroup = defineComponent({
+  props: { ...vuePropsType },
+  name: 'CheckboxGroup',
+  setup(props, {}) {
+    const slots = useSlots();
 
+    const state = reactive({
+      value: props.value || props.defaultValue,
+    });
 
-  const state = reactive({
-    value: props.value || props.defaultValue,
-  });
-
-  const {adapter: adapterInject, getDataAttr} = useBaseComponent<CheckboxGroupProps>(props, state)
-  function adapter(): CheckboxGroupAdapter {
-    return {
-      ...adapterInject<CheckboxGroupProps, CheckboxGroupState>(),
-      updateGroupValue: value => {
-        state.value = value;
-      },
-      notifyChange: evt => {
-        props.onChange && props.onChange(evt);
-      },
-    };
-  }
-  const foundation = new CheckboxGroupFoundation(adapter());
-  onMounted(()=>{
-     foundation.init();
-  })
-
-  watch(()=>props.value,(value, oldValue)=>{
-    if (!isEqual(value, oldValue)) {
-      foundation.handlePropValueChange(props.value);
+    const { adapter: adapterInject, getDataAttr } = useBaseComponent<CheckboxGroupProps>(props, state);
+    function adapter(): CheckboxGroupAdapter {
+      return {
+        ...adapterInject<CheckboxGroupProps, CheckboxGroupState>(),
+        updateGroupValue: (value) => {
+          state.value = value;
+        },
+        notifyChange: (evt) => {
+          props.onChange && props.onChange(evt);
+        },
+      };
     }
-  }, {deep: true})
+    const foundation = new CheckboxGroupFoundation(adapter());
+    onMounted(() => {
+      foundation.init();
+    });
 
-  onUnmounted(()=>{
-     foundation.destroy();
-  })
-
-  function onChange(evt: CheckboxEvent) {
-    foundation.handleChange(evt);
-  }
-
-
-  return () => {
-    const children = slots.default?.()
-    const { options, prefixCls, direction, className, id, style, type, disabled } = props;
-
-    const isPureCardType = type === strings.TYPE_PURECARD;
-    const isCardType = type === strings.TYPE_CARD || isPureCardType;
-
-    const prefix = prefixCls || css.PREFIX;
-    const prefixClsDisplay = classnames({
-      [prefix as string]: true,
-      [`${prefix }-wrapper`]: true,
-      [`${prefix }-${ direction}`]: direction,
-      [`${prefix}-${direction}-cardType`]: direction && isCardType,
-      [`${prefix}-${direction}-pureCardType`]: direction && isPureCardType,
-    }, className);
-
-    const realValue = state.value.slice();
-
-    let inner;
-
-    if (options) {
-      inner = (options || []).map((option, index) => {
-        if (typeof option === 'string') {
-          return (
-            <Checkbox
-              role="listitem"
-              key={index}
-              disabled={props.disabled}
-              value={option}
-              prefixCls={prefixCls}
-            >
-              {option}
-            </Checkbox>
-          );
-        } else {
-          return (
-            <Checkbox
-              role="listitem"
-              key={index}
-              disabled={option.disabled || props.disabled}
-              value={option.value}
-              prefixCls={prefixCls}
-              extra={option.extra}
-              className={option.className}
-              style={option.style}
-              onChange={option.onChange}
-            >
-              {option.label}
-            </Checkbox>
-          );
+    watch(
+      () => props.value,
+      (value, oldValue) => {
+        if (!isEqual(value, oldValue)) {
+          foundation.handlePropValueChange(props.value);
         }
-      });
-    } else if (children) {
-      inner = slots.default?(slots.default().map((itm, index) => cloneVNode(itm, { key: index, role: 'listitem' }))):null;
+      },
+      { deep: true }
+    );
+
+    onUnmounted(() => {
+      foundation.destroy();
+    });
+
+    function onChange(evt: CheckboxEvent) {
+      foundation.handleChange(evt);
     }
 
-    return (
-      <div
-        id={id}
-        role="list"
-        aria-label={props['aria-label']}
-        class={prefixClsDisplay}
-        style={style}
-        aria-labelledby={props['aria-labelledby']}
-        aria-describedby={props['aria-describedby']}
-        {...getDataAttr()}
-        // aria-errormessage={props['aria-errormessage']}
-        // aria-invalid={props['aria-invalid']}
-        // aria-required={props['aria-required']}
-      >
-        <Context.Provider
-          value={{
-            checkboxGroup: {
-              onChange: onChange,
-              value: realValue,
-              disabled: props.disabled,
-              name: foundation.getFormatName(),
-              isCardType,
-              isPureCardType,
-            },
-          }}
+    return () => {
+      const children = slots.default?.();
+      const { options, prefixCls, direction, className, id, style, type, disabled } = props;
+
+      const isPureCardType = type === strings.TYPE_PURECARD;
+      const isCardType = type === strings.TYPE_CARD || isPureCardType;
+
+      const prefix = prefixCls || css.PREFIX;
+      const prefixClsDisplay = classnames(
+        {
+          [prefix as string]: true,
+          [`${prefix}-wrapper`]: true,
+          [`${prefix}-${direction}`]: direction,
+          [`${prefix}-${direction}-cardType`]: direction && isCardType,
+          [`${prefix}-${direction}-pureCardType`]: direction && isPureCardType,
+        },
+        className
+      );
+
+      const realValue = state.value.slice();
+
+      let inner;
+
+      if (options) {
+        inner = (options || []).map((option, index) => {
+          if (typeof option === 'string') {
+            return (
+              <Checkbox role="listitem" key={index} disabled={props.disabled} value={option} prefixCls={prefixCls}>
+                {option}
+              </Checkbox>
+            );
+          } else {
+            return (
+              <Checkbox
+                role="listitem"
+                key={index}
+                disabled={option.disabled || props.disabled}
+                value={option.value}
+                prefixCls={prefixCls}
+                extra={option.extra}
+                className={option.className}
+                style={option.style}
+                onChange={option.onChange}
+              >
+                {option.label}
+              </Checkbox>
+            );
+          }
+        });
+      } else if (children) {
+        inner = slots.default
+          ? slots.default().map((itm, index) => cloneVNode(itm, { key: index, role: 'listitem' }))
+          : null;
+      }
+
+      return (
+        <div
+          id={id}
+          role="list"
+          aria-label={props['aria-label']}
+          class={prefixClsDisplay}
+          style={style}
+          aria-labelledby={props['aria-labelledby']}
+          aria-describedby={props['aria-describedby']}
+          {...getDataAttr()}
+          // aria-errormessage={props['aria-errormessage']}
+          // aria-invalid={props['aria-invalid']}
+          // aria-required={props['aria-required']}
         >
-          {inner}
-        </Context.Provider>
-      </div>
-    );
-  }
-}, {
-  props: vuePropsType,
-  name: 'CheckboxGroup'
-})
+          <Context.Provider
+            value={{
+              checkboxGroup: {
+                onChange: onChange,
+                value: realValue,
+                disabled: props.disabled,
+                name: foundation.getFormatName(),
+                isCardType,
+                isPureCardType,
+              },
+            }}
+          >
+            {inner}
+          </Context.Provider>
+        </div>
+      );
+    };
+  },
+});
 
-
-export default CheckboxGroup
-
+export default CheckboxGroup;

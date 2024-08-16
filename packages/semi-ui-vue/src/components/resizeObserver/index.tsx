@@ -12,6 +12,7 @@ import {
   watch,
 } from 'vue';
 import { vuePropsMake } from '../PropTypes';
+import { CombineProps } from '../interface';
 
 /** A parallel type to `ResizeObserverEntry` (from resize-observer-polyfill). */
 export interface ResizeEntry {
@@ -23,31 +24,34 @@ export interface ReactResizeObserverProps extends BaseProps {
   onResize?: (entries: ResizeEntry[]) => void;
   observeParent?: boolean;
   observerProperty?: ObserverProperty;
-  delayTick?: number
+  delayTick?: number;
 }
-
 
 export enum ObserverProperty {
-  Width='width',
-  Height = "height",
-  All = "all"
+  Width = 'width',
+  Height = 'height',
+  All = 'all',
 }
-const propTypes: ComponentObjectPropsOptions<ReactResizeObserverProps> = {
+const propTypes: CombineProps<ReactResizeObserverProps> = {
   onResize: PropTypes.func as PropType<ReactResizeObserverProps['onResize']>,
   observeParent: PropTypes.bool,
   observerProperty: PropTypes.string as PropType<ReactResizeObserverProps['observerProperty']>,
-  delayTick: PropTypes.number
+  delayTick: PropTypes.number,
+  style: PropTypes.object,
+  className: PropTypes.string,
 };
 
 const defaultProps = {
   onResize: () => {}, // eslint-disable-line
   observeParent: false,
-  observerProperty: "all",
-  delayTick: 0
+  observerProperty: 'all',
+  delayTick: 0,
 };
 export const vuePropsType = vuePropsMake<ReactResizeObserverProps>(propTypes, defaultProps);
-const ReactResizeObserver = defineComponent<ReactResizeObserverProps>(
-  (props, {}) => {
+const ReactResizeObserver = defineComponent({
+  props: { ...vuePropsType },
+  name: 'ReactResizeObserver',
+  setup(props, {}) {
     const slots = useSlots();
     let observer: ResizeObserver;
     if (globalThis['ResizeObserver']) {
@@ -57,8 +61,7 @@ const ReactResizeObserver = defineComponent<ReactResizeObserverProps>(
     let element: Element;
     let _parentNode: HTMLElement;
 
-    let formerPropertyValue: Map<Element, number> = new Map()
-
+    let formerPropertyValue: Map<Element, number> = new Map();
 
     onMounted(() => {
       if (globalThis['ResizeObserver']) {
@@ -95,14 +98,14 @@ const ReactResizeObserver = defineComponent<ReactResizeObserverProps>(
       }
     };
 
-    function handleResizeEventTriggered(entries: ResizeEntry[]){
+    function handleResizeEventTriggered(entries: ResizeEntry[]) {
       if (props.observerProperty === ObserverProperty.All) {
         props.onResize?.(entries);
       } else {
         const finalEntries: ResizeEntry[] = [];
         for (const entry of entries) {
           if (formerPropertyValue.has(entry.target)) {
-            if (entry.contentRect[props.observerProperty]!==formerPropertyValue.get(entry.target)) {
+            if (entry.contentRect[props.observerProperty] !== formerPropertyValue.get(entry.target)) {
               formerPropertyValue.set(entry.target, entry.contentRect[props.observerProperty]);
               finalEntries.push(entry);
             }
@@ -111,7 +114,7 @@ const ReactResizeObserver = defineComponent<ReactResizeObserverProps>(
             finalEntries.push(entry);
           }
         }
-        if (finalEntries.length>0) {
+        if (finalEntries.length > 0) {
           props.onResize?.(finalEntries);
         }
       }
@@ -164,16 +167,12 @@ const ReactResizeObserver = defineComponent<ReactResizeObserverProps>(
 
     return () => {
       const child = slots.default?.();
-      const { ref } = child as any;
+      const { ref } = child?.[0] as any;
       return cloneVNode(child[0], {
-        ref: (node: any) => mergeRef(ref, node),
+        ref: (node: any) => mergeRef(ref?.r, node),
       });
     };
   },
-  {
-    props: vuePropsType,
-    name: 'ReactResizeObserver',
-  }
-);
+});
 
 export default ReactResizeObserver;

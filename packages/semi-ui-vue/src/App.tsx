@@ -2,9 +2,11 @@ import {defineComponent, ref, h, onMounted, watch,} from 'vue'
 import AvatarDemo from './components/avatar/__test__/AvatarDemo'
 import Button from "./components/button/__test__/Demo";
 import './docDemo.scss'
+
 import IconTest from "./components/__test__/IconTest";
 import TooltipDemo from "./components/tooltip/__test__/TooltipDemo";
 import DropdownDemo1 from "./components/dropdown/__test__/DropdownDemo1";
+import DropdownDemoSFC from "./components/dropdown/__test__/DropdownDemoSFC.vue";
 import GridTest from "./components/grid/__test__/GridTest";
 import LayoutTest from "./components/layout/__test__/LayoutTest";
 import SpaceTest from "./components/space/__test__/SpaceTest";
@@ -100,6 +102,38 @@ import SelectDemo4 from './components/select/__test__/SelectDemo4.vue';
 import SelectDemo5 from './components/select/__test__/SelectDemo5';
 import ModalDemo2 from './components/modal/__test__/ModalDemo2';
 import NotificationDemo2 from './components/notification/__test__/NotificationDemo2';
+import TreeDemo2 from './components/tree/__test__/TreeDemo2';
+import NotificationDemo3 from './components/notification/__test__/NotificationDemo3';
+import TypoDemo2 from './components/typography/__test__/TypoDemo2';
+import CascaderDemo3 from './components/cascader/__test__/CascaderDemo3';
+import TabsDemo4 from './components/tabs/__test__/TabsDemo4';
+import DemoButtonSFC from './components/button/__test__/DemoButtonSFC.vue';
+import SkeletonDemoSFC from './components/skeleton/__test__/SkeletonDemoSFC.vue';
+import BreadcrumbDemo2 from './components/breadcrumb/__test__/BreadcrumbDemo2';
+import TypoDemo3 from './components/typography/__test__/TypoDemo3';
+
+import ModalDemoVueSFC from './components/modal/__test__/ModalDemoVueSFC.vue';
+import AutoCompleteSFC from './components/autoComplete/__test__/AutoCompleteSFC.vue';
+import DiyItemAutoComplete from './components/autoComplete/__test__/diyItemAutoComplete.vue';
+import RemoteAutoComplete from './components/autoComplete/__test__/remoteAutoComplete.vue';
+import TypoDemoSFC from './components/typography/__test__/TypoDemoSFC.vue';
+import NumeralDemo from './components/typography/__test__/NumeralDemo';
+import TextDemo from './components/typography/__test__/textDemo.vue';
+import LinkDemo from './components/typography/__test__/linkDemo.vue';
+import TypoCopyDemo from './components/typography/__test__/TypoCopyDemo';
+import UpdateDemo2 from './components/upload/__test__/UpdateDemo2';
+import TableDemoColumnChildren from './components/table/__test__/TableDemoColumnChildren';
+import TableDemoSFC from './components/table/__test__/TableDemoSFC.vue';
+import PinCodeDemo from './components/pincode/__test__/PinCodeDemo';
+import LottieDemo from './components/lottie/__test__/LottieDemo';
+import CodeHighlightDemo from './components/codeHighlight/__test__/CodeHighlightDemo';
+import MarkDownRenderDemo from './components/markdownRender/__test__/markDownRenderDemo';
+import DatePickerTriggerRenderDemo from './components/datePicker/__test__/DatePickerTriggerRenderDemo.vue';
+import FormRenderDemo from './components/form/__test__/FormRenderDemo';
+import ChatDemo from './components/chat/__test__/ChatDemo';
+import ToastUseDemo from './components/toast/__test__/ToastUseDemo';
+import SelectDemoToRawTest from './components/select/__test__/SelectDemoToRawTest';
+import ColorPickerDemo from './components/colorPicker/__test__/ColorPickerDemo';
 export interface ExampleProps {
   name?: string
 }
@@ -142,6 +176,7 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<AnchorDemo />*/}
         {/*<TabsDemo />*/}
         {/*<TabsDemo3/>*/}
+        {/*<TabsDemo4/>*/}
         {/*<TabsDemoVueSFC/>*/}
         {/*<CardDemo >*/}
         {/*  {a.value}*/}
@@ -149,6 +184,9 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<BadgeDemo />*/}
         {/*<OverflowListDemo1 />*/}
         {/*<OverflowListDemoScroll />*/}
+        {/*<PinCodeDemo/>*/}
+        {/*<TableDemoColumnChildren/>*/}
+        {/*<TableDemoSFC/>*/}
         {/*<TableDemo1 />*/}
         {/*<TableDemo2 />*/}
         {/*<TableDemo3 />*/}
@@ -165,20 +203,23 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<PaginationDemo />*/}
         {/*<PopconfirmDemo/>*/}
         {/*<NotificationDemo/>*/}
-        <NotificationDemo2/>
+        {/*<NotificationDemo2/>*/}
+        {/*<NotificationDemo3/>*/}
         {/*<BannerDemo/>*/}
         {/*<ToastDemo/>*/}
+        {/*<ToastUseDemo/>*/}
         {/*<ImageDemo/>*/}
         {/*<SkeletonDemo/>*/}
         {/*<FormAllDemo />*/}
         {/*<FormDemo />*/}
+        {/*<FormRenderDemo/>*/}
         {/*<WithFormApiDemo />*/}
         {/*<WithFormStateDemo/>*/}
         {/*<WithFieldDemo/>*/}
         {/*<WithFieldDemo2/>*/}
         {/*<TreeSelectDemo/>*/}
         {/*<TreeCheckDemo />*/}
-        {/*<TreeDemo />*/}
+        {/*<TreeDemo2 />*/}
         <div style={{backgroundColor: 'red', width: 300, height: 300}}>
 
         </div>
@@ -191,20 +232,33 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<ModalDemoHook />*/}
         {/*<ModalDemoConfirm/>*/}
         {/*<ModalDemo/>*/}
+        {/*<ModalDemoVueSFC/>*/}
         {/*<ModalDemo2/>*/}
+        {/*<LottieDemo/>*/}
+        {/*<MarkDownRenderDemo/>*/}
+        {/*<CodeHighlightDemo/>*/}
         {/*<UploadDemo/>*/}
+        {/*<UpdateDemo2/>*/}
         {/*<ProgressDemo/>*/}
         {/*<SwitchDemo/>*/}
         {/*<BreadcrumbDemo/>*/}
+        {/*<BreadcrumbDemo2/>*/}
         {/*<DatePickerDemo />*/}
         {/*<DatePickerDemo2/>*/}
+        {/*<DatePickerTriggerRenderDemo/>*/}
         {/*<TimePickerDemo />*/}
         {/*<ScrollListDemo />*/}
         {/*<CascaderDemo/>*/}
+        {/*<CascaderDemo3/>*/}
         {/*<CheckboxDemo />*/}
         {/*<TagInputDemo />*/}
 
         {/*<AutoCompleteDemo/>*/}
+        {/*<DiyItemAutoComplete/>*/}
+        {/*<RemoteAutoComplete/>*/}
+        {/*<AutoCompleteSFC/>*/}
+        <ColorPickerDemo/>
+        {/*<SelectDemoToRawTest/>*/}
         {/*<SelectDemo/>*/}
         {/*<SelectDemo2/>*/}
         {/*<SelectDemo3/>*/}
@@ -216,10 +270,20 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
 
         {/*<InputDemo />*/}
         {/*<TypeDemo />*/}
+        {/*<TypoDemo3/>*/}
 
+        {/*<TypoDemo2/>*/}
+        {/*<TypoDemoSFC/>*/}
+        {/*<NumeralDemo/>*/}
+        {/*<TextDemo/>*/}
+        {/*<LinkDemo/>*/}
+        {/*<TypoCopyDemo/>*/}
         {/*<div style={{color:'#E91E63',width: 100, display:'flex', flexWrap:'wrap'}}>*/}
         {/*  <Button />*/}
+        {/*<DemoButtonSFC/>*/}
         {/*</div>*/}
+        {/*<SkeletonDemo/>*/}
+        {/*<SkeletonDemoSFC/>*/}
 
         {/*<IconTest />*/}
         {/*<br/>*/}
@@ -227,12 +291,14 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<br/>*/}
         {/*<br/>*/}
         {/*<DropdownDemo1/>*/}
+        {/*<DropdownDemoSFC/>*/}
         {/*<br/>*/}
         {/*<GridTest />*/}
         {/*<LayoutTest/>*/}
         {/*<SpaceTest/>*/}
         {/*<PopoverTest />*/}
         {/*<NavigationDemo />*/}
+        {/*<ChatDemo/>*/}
         <div class={'aa'}>123</div>
       </ConfigProvider>
     </div>

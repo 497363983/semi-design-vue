@@ -11,7 +11,7 @@ interface ExampleProps {
 export const vuePropsType = {
   name: String,
 };
-const FormDemo = defineComponent<ExampleProps>((props, { attrs }) => {
+const FormDemo = defineComponent((props, { attrs }) => {
   const slots = useSlots();
   const formApi = ref<FormApi<any>>()
 
@@ -49,7 +49,10 @@ const FormDemo = defineComponent<ExampleProps>((props, { attrs }) => {
           style={{ width: 176 }}
           validate={(fieldValue, values) => fieldValue >= 5 ? 'value not valid': ''}
         />
-        <FormSelect field="Role" label={{ text: '角色', optional: true }} style={{ width: 176 }}>
+        <FormSelect field="Role" label={{ text: '角色', optional: true }} style={{ width: 176 }}
+                    rules={[
+                      { required: true, message: 'required error' },
+                    ]}>
           <FormSelectOption value="admin">管理员</FormSelectOption>
           <FormSelectOption value="user">普通用户</FormSelectOption>
           <FormSelectOption value="guest">访客</FormSelectOption>

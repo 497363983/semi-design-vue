@@ -5,7 +5,7 @@ import {NavContextType} from "../nav-context";
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:NavContextType}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = ref<NavContextType>(props.value);
 
   watch(()=>props.value, ()=>{
@@ -14,7 +14,7 @@ const Provider = defineComponent<{value:NavContextType}>((props, {slots}) => {
   provide('NavContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'NavContextProvider'
 })
 

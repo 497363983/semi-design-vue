@@ -1,6 +1,7 @@
 import {defineComponent, ref, h, Fragment, useSlots, reactive, CSSProperties} from 'vue'
-import {Radio, RadioGroup} from "../../index";
 import Calendar from "../index";
+import Radio from '../../radio/radio';
+import RadioGroup from '../../radio/radioGroup';
 
 interface EventDemoProps {
   name?: string
@@ -9,7 +10,7 @@ interface EventDemoProps {
 export const vuePropsType = {
   name: String
 }
-const EventDemo = defineComponent<EventDemoProps>((props, {}) => {
+const EventDemo = defineComponent((props, {}) => {
   const slots = useSlots()
   const state = reactive<{mode:"week" | "month" | "range" | "day"}>({
     mode: 'week',
@@ -124,8 +125,8 @@ const EventDemo = defineComponent<EventDemoProps>((props, {}) => {
     );
   }
 }, {
-  props: vuePropsType,
-  name :'EventDemo'
+  props: { ...vuePropsType },
+  name: 'EventDemo'
 })
 
 

@@ -6,7 +6,7 @@ import {ContextValue} from "../context";
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:ContextValue}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = ref<ContextValue>(props.value);
 
   watch(()=>props.value, ()=>{
@@ -15,7 +15,7 @@ const Provider = defineComponent<{value:ContextValue}>((props, {slots}) => {
   provide('StepsContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'StepsContextProvider'
 })
 

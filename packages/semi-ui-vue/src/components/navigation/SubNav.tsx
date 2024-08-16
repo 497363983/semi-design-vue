@@ -9,22 +9,30 @@ import SubNavFoundation, { SubNavAdapter } from '@douyinfe/semi-foundation/navig
 import { strings, numbers, cssClasses } from '@douyinfe/semi-foundation/navigation/constants';
 import { IconChevronDown, IconChevronUp, IconChevronRight } from '@kousum/semi-icons-vue';
 
-// @ts-ignore
 import NavItem from './Item';
-// @ts-ignore
-import type { NavItemProps, NavItemState } from './Item';
 import Dropdown, { DropdownMenu } from '../dropdown';
 import type { DropdownProps } from '../dropdown';
 import NavContext, { NavContextType } from './nav-context';
 
-import { times, get } from 'lodash';
+import { times, get, isNumber, isString } from 'lodash';
 import Collapsible from '../collapsible';
 import CSSAnimation from '../_cssAnimation';
 
-import { cloneVNode, CSSProperties, defineComponent, h, isVNode, reactive, ref, useSlots, VNode } from 'vue';
+import {
+  cloneVNode,
+  ComponentObjectPropsOptions,
+  CSSProperties,
+  defineComponent,
+  h,
+  isVNode, PropType,
+  reactive,
+  ref,
+  useSlots,
+  VNode,
+} from 'vue';
 import { useNavContext } from './nav-context/Consumer';
 import { vuePropsMake } from '../PropTypes';
-import {VueJsxNode} from "../interface";
+import { CombineProps, VueJsxNode } from '../interface';
 
 export interface ToggleIcon {
   open?: string;
@@ -45,13 +53,14 @@ export interface SubNavProps extends BaseProps {
   onMouseLeave?: any;
   text?: VueJsxNode;
   expandIcon?: VueJsxNode
+  toggleIcon?: VueJsxNode
 }
 
 export interface SubNavState {
   isHovered: boolean;
 }
 
-const propTypes = {
+const propTypes: CombineProps<SubNavProps> = {
   /**
    * Unique identification
    */
@@ -76,7 +85,7 @@ const propTypes = {
   /**
    * The icon name of the right control switch (on and off status)
    */
-  toggleIcon: PropTypes.any,
+  toggleIcon: PropTypes.node as PropType<SubNavProps['toggleIcon']>,
   style: PropTypes.object,
   /**
    * Icon name on the left
@@ -91,6 +100,8 @@ const propTypes = {
   // Is it disabled
   disabled: PropTypes.bool,
   level: PropTypes.number,
+  dropdownStyle: PropTypes.object,
+  className: PropTypes.string,
 
 };
 
@@ -107,7 +118,10 @@ const defaultProps = {
   disabled: false,
 };
 export const vuePropsType = vuePropsMake(propTypes, defaultProps);
-const SubNav = defineComponent<SubNavProps>((props, {}) => {
+const SubNav = defineComponent({
+  props: { ...vuePropsType },
+  name: 'SubNav',
+  setup(props, {}) {
   const slots = useSlots();
   const { context } = useNavContext();
 
@@ -221,7 +235,7 @@ const SubNav = defineComponent<SubNavProps>((props, {}) => {
 
     const { mode, isInSubNav, isCollapsed, prefixCls, subNavMotion, limitIndent } = context.value;
 
-      const isOpen = adapter.getIsOpen();
+    const isOpen = adapter.getIsOpen();
 
     const titleCls = cls(`${prefixCls}-sub-title`, {
       [`${prefixCls}-sub-title-selected`]: adapter.getIsSelected(itemKey),
@@ -302,29 +316,29 @@ const SubNav = defineComponent<SubNavProps>((props, {}) => {
       [`${prefixCls}-sub-popover`]: isCollapsed || isHorizontal,
     });
 
-      const ulWithMotion = <Collapsible
-        motion={subNavMotion as boolean}
-        isOpen={isOpen}
-        keepDOM={false}
-        fade={true}>
-          {
-              !isCollapsed ? <ul
-                class={subNavCls}
-              >
-                  {{
-                      default: slots.default,
-                  }}
-              </ul>: null
-          }
-      </Collapsible>;
+    const ulWithMotion = <Collapsible
+      motion={subNavMotion as boolean}
+      isOpen={isOpen}
+      keepDOM={false}
+      fade={true}>
+      {
+        !isCollapsed ? <ul
+          class={subNavCls}
+        >
+          {{
+            default: slots.default,
+          }}
+        </ul>: null
+      }
+    </Collapsible>;
 
     const finalDom = isHorizontal ? null : subNavMotion ? (
       ulWithMotion
     ) : isOpen && !isCollapsed ? (
       <ul class={subNavCls}>
-          {{
-              default: slots.default,
-          }}
+        {{
+          default: slots.default,
+        }}
       </ul>
     ) : null;
 
@@ -420,9 +434,7 @@ const SubNav = defineComponent<SubNavProps>((props, {}) => {
       </NavItem>
     );
   };
-}, {
-  props: vuePropsType,
-  name: 'SubNav'
+}
 });
 
 

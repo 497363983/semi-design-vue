@@ -5,7 +5,7 @@ import {FormUpdaterContextType} from "@douyinfe/semi-foundation/form/interface";
 export const vuePropsType = {
   value: Object
 }
-const Provider = defineComponent<{value:FormUpdaterContextType}>((props, {slots}) => {
+const Provider = defineComponent((props, {slots}) => {
   const ConfigContext = shallowRef<FormUpdaterContextType>();
 
   watch(()=>props.value, ()=>{
@@ -14,7 +14,7 @@ const Provider = defineComponent<{value:FormUpdaterContextType}>((props, {slots}
   provide('FormUpdaterContext', ConfigContext)
   return ()=>slots.default?slots.default(ConfigContext.value):null
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'FormUpdaterContextProvider'
 })
 

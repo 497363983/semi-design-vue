@@ -11,7 +11,7 @@ interface UploadDemoProps {
 export const vuePropsType = {
   name: String,
 };
-const UploadDemo = defineComponent<UploadDemoProps>((props, {}) => {
+const UploadDemo = defineComponent((props, {}) => {
   const slots = useSlots();
 
   const fileList = ref<FileItem[]>([
@@ -33,12 +33,17 @@ const UploadDemo = defineComponent<UploadDemoProps>((props, {}) => {
         }}
         action="https://run.mocky.io/v3/d6ac5c9e-4d39-4309-a747-7ed3b5694859"
       >
-        <Button icon={<IconUpload />} theme="light">
+        <Button
+          role={'bt1'}
+          icon={<IconUpload />}
+          theme="light"
+        >
           点击上传
         </Button>
       </Upload>
       <Upload listType="picture" action="https://run.mocky.io/v3/d6ac5c9e-4d39-4309-a747-7ed3b5694859">
-        <Button icon={<IconUpload />} theme="light">
+        <Button
+          role={'bt2'}  icon={<IconUpload />} theme="light">
           点击上传
         </Button>
       </Upload>

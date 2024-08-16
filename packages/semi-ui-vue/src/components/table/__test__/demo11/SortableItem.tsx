@@ -37,7 +37,7 @@ export const vuePropsType = {
   }
 }
 
-const SortableItem = defineComponent<SortableItemProps>((props, {attrs}) => {
+const SortableItem = defineComponent((props, {attrs}) => {
 
   const slots = useSlots()
 
@@ -80,7 +80,7 @@ const SortableItem = defineComponent<SortableItemProps>((props, {attrs}) => {
 
   }
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'SortableItem'
 })
 

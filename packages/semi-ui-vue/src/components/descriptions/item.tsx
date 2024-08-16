@@ -5,7 +5,7 @@ import getDataAttr from '@douyinfe/semi-foundation/utils/getDataAttr';
 import { CSSProperties, defineComponent, h, useSlots, VNode } from 'vue';
 import { vuePropsMake } from '../PropTypes';
 import { useDescriptionsContext } from './context/Consumer';
-import { VueJsxNode } from '../interface';
+import { CombineProps, VueJsxNode } from '../interface';
 import { useAttrs } from 'vue';
 
 export interface DescriptionsItemProps {
@@ -21,17 +21,26 @@ const prefixCls = cssClasses.PREFIX;
 const keyCls = `${prefixCls}-key`;
 const valCls = `${prefixCls}-value`;
 
-const propTypes = {
+const propTypes: CombineProps<{
+  itemKey?: any;
+  hidden?: boolean;
+  className?: string;
+  style?: any;
+  span?: number;
+  value?: any;
+}> = {
   itemKey: PropTypes.node,
   hidden: PropTypes.bool,
   className: PropTypes.string,
   style: PropTypes.object,
   span: PropTypes.number,
-  value: PropTypes.node
+  value: PropTypes.node,
 };
 export const vuePropsType = vuePropsMake(propTypes, {});
-const DescriptionsItem = defineComponent<DescriptionsItemProps>(
-  (props, {}) => {
+const DescriptionsItem = defineComponent({
+  props: { ...vuePropsType },
+  name: 'DescriptionsItem',
+  setup(props, {}) {
     const slots = useSlots();
     const attr = useAttrs();
 
@@ -55,7 +64,7 @@ const DescriptionsItem = defineComponent<DescriptionsItemProps>(
           <th class={`${prefixCls}-item ${prefixCls}-item-th`}>
             <span class={keyCls}>{itemKey}</span>
           </th>
-          <td class={`${prefixCls}-item ${prefixCls}-item-td`} colspan={span? ((span * 2) - 1) : 1}>
+          <td class={`${prefixCls}-item ${prefixCls}-item-td`} colspan={span ? span * 2 - 1 : 1}>
             <span class={valCls}>{children}</span>
           </td>
         </>
@@ -74,10 +83,6 @@ const DescriptionsItem = defineComponent<DescriptionsItemProps>(
       return layout === 'horizontal' ? horizontalItem : item;
     };
   },
-  {
-    props: vuePropsType,
-    name: 'DescriptionsItem',
-  }
-);
+});
 
 export default DescriptionsItem;

@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { type OutputModes, Repl, useStore, useVueImportMap } from '@vue/repl';
 // import Monaco from '@vue/repl/monaco-editor'
-import CodeMirror from '@vue/repl/codemirror-editor'
+import CodeMirror from '@vue/repl/codemirror-editor';
 import { onMounted, PropType, ref } from 'vue';
-import {useData} from "vitepress";
+import { useData } from 'vitepress';
 
 const props = defineProps({
   files: {
     type: Object,
   },
-  layout: String as PropType<'vertical' | 'horizontal'>
-})
+  layout: String as PropType<'vertical' | 'horizontal'>,
+});
 
-const {isDark} = useData();
+const { isDark } = useData();
 
 // retrieve some configuration options from the URL
-const query = new URLSearchParams(location.search)
-
+const query = new URLSearchParams(location.search);
 
 const {
   importMap: builtinImportMap,
@@ -27,12 +26,17 @@ const {
   // default is the CDN link from jsdelivr.com with version matching Vue's version
   // from peerDependency
   // runtimeDev: import.meta.env.BASE_URL + 'vue.runtime.esm-browser.js',
-  runtimeProd: import.meta.env.BASE_URL + 'runtime-dom.esm-browser.prod.js',
+  runtimeProd: import.meta.env.BASE_URL + 'runtime-dom.esm-browser.js',
   // serverRenderer: import.meta.env.BASE_URL + 'server-renderer.esm-browser.js',
-})
+});
 builtinImportMap.value.imports = {
-  "@kousum/semi-ui-vue": import.meta.env.BASE_URL + 'semi/semi-ui-vue.js',
-}
+  '@kousum/semi-ui-vue': import.meta.env.BASE_URL + 'semi/semi-ui-vue.js',
+  '@kousum/semi-icons-vue': import.meta.env.BASE_URL + 'semiIcons/semi-icons-vue.js',
+  '@kousum/semi-icons-lab-vue': import.meta.env.BASE_URL + 'semiIconsLab/semi-icons-lab-vue.js',
+  'lodash': import.meta.env.BASE_URL + 'lodash.js',
+  'date-fns': import.meta.env.BASE_URL + 'date-fns.js',
+  '@kousum/semi-illustrations-vue': import.meta.env.BASE_URL + 'semiIllustrations/semi-illustrations-vue.js',
+};
 
 const store = useStore(
   {
@@ -44,17 +48,31 @@ const store = useStore(
     // starts on a different tab on the output pane if the URL has a outputMode query
     // and default to the "preview" tab
     outputMode: ref((query.get('outputMode') || 'preview') as OutputModes),
-
-  },
+  }
   // initialize repl with previously serialized state
   // location.hash,
-)
-
+);
 
 const previewOptions = {
   headHTML: `
-<link rel="stylesheet" href="${import.meta.env.BASE_URL}semi/style.css" data-n-g="">
+<!--<link rel="stylesheet" href="${import.meta.env.BASE_URL}reset.css">-->
+<link rel="stylesheet" href="${import.meta.env.BASE_URL}semi/style.css">
+<link rel="stylesheet" href="${import.meta.env.BASE_URL}semiIcons/style.css">
+<link rel="stylesheet" href="${import.meta.env.BASE_URL}semiIconsLab/style.css">
 <style>
+#app{
+padding: 10px;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("${import.meta.env.BASE_URL}font/Inter-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Inter-Bold";
+  src: url("${import.meta.env.BASE_URL}font/Inter-Bold.ttf") format("truetype");
+}
 
 .grid .semi-row,.grid .semi-row-flex {
     text-align: center
@@ -75,6 +93,34 @@ const previewOptions = {
     height: 50px;
     background: var(--semi-color-fill-0)
 }
+
+.components-layout-demo {
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+    margin: 60px;
+    border-top: 22px solid var(--semi-color-fill-1);
+    border-radius: 5px 5px 0 0;
+    box-shadow: var(--semi-shadow-elevated);
+    color: var(--semi-color-text-1);
+}
+.components-layout-demo:before {
+    content: "";
+    position: absolute;
+    top: -14px;
+    left: 12px;
+    display: block;
+    width: 6px;
+    height: 6px;
+    background-color: rgba(var(--semi-red-4), 1);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(var(--semi-red-4), 1), 15px 0 0 2px rgba(var(--semi-yellow-4), 1), 30px 0 0 2px rgba(var(--semi-green-4), 1);
+}
+
+.btn-margin-right button{
+  margin-right: 10px;
+}
+
 </style>
 <script>
 
@@ -103,23 +149,55 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 <\/script>
-`
+`,
+};
+
+const isTsx = Object.keys(props.files)[0].indexOf('.tsx') > -1;
+let files = {
+  ...props.files,
+};
+if (isTsx) {
+  files = {
+    [Object.keys(props.files)[0].replace('.tsx', 'App.vue')]: `<script setup>
+import Demo from '${Object.keys(props.files)[0].replace('src/', './')}'
+<\/script>
+
+<template>
+  <Demo />
+</template>`,
+    ...props.files,
+  };
 }
 
-
-store.setFiles({
-  'tsconfig.json': store.getFiles()['tsconfig.json'],
-  'import-map.json': store.getFiles()['import-map.json'],
-  ...props.files
-}, Object.keys(props.files)[0]).then(()=>{
-  // store.setFiles(store.getFiles())
-})
-
+store
+  .setFiles(
+    {
+      'tsconfig.json': store.getFiles()['tsconfig.json'],
+      'import-map.json': store.getFiles()['import-map.json'],
+      ...files,
+    },
+    Object.keys(files)[0]
+  )
+  .then(() => {
+    // store.setFiles(store.getFiles())
+    if (isTsx) {
+      store.setActive(Object.keys(files)[1]);
+    }
+  });
 
 // production mode is enabled
-productionMode.value = true
+productionMode.value = true;
 </script>
 
 <template>
-  <Repl :theme="'dark'" :layout="layout" :layoutReverse="true" :preview-options="previewOptions" style="width: 100%;height: 100%;" :store="store" :editor="CodeMirror" :showCompileOutput="true" />
+  <Repl
+    :theme="'dark'"
+    :layout="layout"
+    :layoutReverse="true"
+    :preview-options="previewOptions"
+    style="width: 100%; height: 100%"
+    :store="store"
+    :editor="CodeMirror"
+    :showCompileOutput="true"
+  />
 </template>

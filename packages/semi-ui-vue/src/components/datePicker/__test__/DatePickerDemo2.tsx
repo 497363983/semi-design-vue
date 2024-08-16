@@ -1,15 +1,16 @@
 import { defineComponent, ref, h, Fragment, useSlots } from 'vue';
 import type { ComponentObjectPropsOptions } from 'vue';
 import { Form, FormDatePicker } from '../../form';
+import DatePicker from '../index';
 
 interface DatePickerDemo2Props {
   name?: string;
 }
 
-export const vuePropsType: ComponentObjectPropsOptions<DatePickerDemo2Props> = {
+export const vuePropsType: CombineProps<DatePickerDemo2Props> = {
   name: String,
 };
-const DatePickerDemo2 = defineComponent<DatePickerDemo2Props>((props, {}) => {
+const DatePickerDemo2 = defineComponent((props, {}) => {
   const slots = useSlots();
 
 
@@ -18,10 +19,11 @@ const DatePickerDemo2 = defineComponent<DatePickerDemo2Props>((props, {}) => {
       <Form>
         <FormDatePicker field='ssss'/>
       </Form>
+      <DatePicker type={'month'}/>
     </div>
   );
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'DatePickerDemo2',
 });
 

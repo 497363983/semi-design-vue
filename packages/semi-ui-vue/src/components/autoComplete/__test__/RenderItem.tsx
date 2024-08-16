@@ -11,7 +11,7 @@ const AutoComplete = AutoCompleteFunc<{name: string, email: string, abbr: string
 export const vuePropsType = {
   name: String
 }
-const RenderItem = defineComponent<ExampleProps>((props, {slots}) => {
+const RenderItem = defineComponent((props, {slots}) => {
 
   const state = reactive({
     data: [],
@@ -70,7 +70,7 @@ const RenderItem = defineComponent<ExampleProps>((props, {slots}) => {
     </div>
   )
 }, {
-  props: vuePropsType,
+  props: { ...vuePropsType },
   name: 'RenderItem'
 })
 

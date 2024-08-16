@@ -12,7 +12,7 @@ import {
     BasicOnDragProps,
     KeyMapProps,
 } from '@douyinfe/semi-foundation/tree/foundation';
-import {CSSProperties} from "vue";
+import { CSSProperties, VNode } from 'vue';
 import {VueJsxNode} from "../interface";
 
 /* Tree */
@@ -67,7 +67,7 @@ export interface TreeProps extends BasicTreeProps {
     style?: CSSProperties;
     treeData?: TreeNodeData[];
     value?: Value;
-    icon?: VueJsxNode;
+    icon?: VNode | ((props: TreeNodeProps) => VNode);
     keyMaps?: KeyMapProps;
     loadData?: (treeNode?: TreeNodeData) => Promise<void>;
     onChange?: (value?: Value) => void;
@@ -85,6 +85,7 @@ export interface TreeProps extends BasicTreeProps {
     renderDraggingNode?: (nodeInstance: HTMLElement, node: TreeNodeData) => HTMLElement;
     renderFullLabel?: (renderFullLabelProps: RenderFullLabelProps) => VueJsxNode;
     renderLabel?: (label?: VueJsxNode, treeNode?: TreeNodeData) => VueJsxNode;
+    autoMergeValue?: boolean
 
     selectedKey?: string
     role?: string
@@ -163,11 +164,11 @@ export interface FlattenNode extends BasicFlattenNode {
 export interface NodeListProps {
     flattenNodes: FlattenNode[];
     motionKeys: Set<string>;
-    motionType: string;
-    flattenList: FlattenNode[] | undefined;
+    motionType?: string;
+    flattenList?: FlattenNode[] | undefined;
     searchTargetIsDeep?: boolean;
     renderTreeNode: (treeNode: FlattenNode, ind?: number, style?: CSSProperties) => VueJsxNode;
-    onMotionEnd: ()=>void
+    onMotionEnd?: ()=>void
     role?: string
 }
 export type TransitionNodes<T> = Array<T | Array<T>>;

@@ -16,13 +16,14 @@ import warning from '@douyinfe/semi-foundation/utils/warning';
 import { useArrayFieldState, useFormState, useStateWithGetter } from '../hooks/index';
 import ErrorMessage from '../errorMessage';
 import { isElement } from '../../_base/reactUtils';
-import Label from '../label';
+import Label, { type LabelProps } from '../label';
 import { Col } from '../../grid';
 import type { CallOpts, WithFieldOption } from '@douyinfe/semi-foundation/form/interface';
 import type { CommonexcludeType, CommonFieldProps } from '../interface';
 import type { Subtract } from 'utility-types';
 import {
   type ComponentObjectPropsOptions,
+  type CSSProperties,
   defineComponent,
   type DefineComponent,
   type DefineSetupFnComponent,
@@ -32,15 +33,17 @@ import {
   onBeforeMount,
   onBeforeUnmount,
   onMounted,
+  PropType,
   type Ref,
   ref,
   shallowRef,
   unref,
   useSlots,
+  type VNode,
   watch,
   withMemo,
 } from 'vue';
-import { VueHTMLAttributes } from '../../interface';
+import { CombineProps, VueHTMLAttributes, type VueJsxNode } from '../../interface';
 import { useFormUpdaterContext } from '../context/FormUpdaterContext/Consumer';
 import { omit } from 'lodash';
 import { useHasInProps } from '../../_base/baseComponent';
@@ -60,15 +63,74 @@ const useIsomorphicEffect = typeof window !== 'undefined' ? onBeforeMount : onMo
 
 function withField<
   C,
-  T extends Subtract<VueHTMLAttributes, CommonexcludeType> & CommonFieldProps & VueHTMLAttributes & C
+  T extends Subtract<VueHTMLAttributes, CommonexcludeType> & CommonFieldProps & VueHTMLAttributes & C,
 >(
   Component: DefineSetupFnComponent<C> | ((props: C) => any),
   opts?: WithFieldOption,
-  vuePropsType?: ComponentObjectPropsOptions<C>
-): DefineSetupFnComponent<T> {
-  const SemiField = defineComponent<T>(
+  vuePropsType?: CombineProps<C>
+) {
+  const propsFromComponent_ = (Component as unknown as DefineComponent).props || {};
+  const propsFromComponent = {};
+  Object.keys(propsFromComponent_).forEach((key) => {
+    propsFromComponent[key] = {
+      ...propsFromComponent_[key],
+      default: undefined,
+    };
+    delete propsFromComponent[key].default;
+  });
+  const vueProps: CombineProps<CommonFieldProps> = {
+    ...omit(
+      { ...propsFromComponent, ...(vuePropsType || {}) } || {},
+      // 'style',
+      'class', 'key'
+    ),
+    label: [...PropTypes.node, PropTypes.func],
+    id: [String],
+    field: {
+      type: String,
+      required: true
+    },
+    className: String,
+    prefix: String,
+    labelPosition: String as PropType<CommonFieldProps['labelPosition']>,
+    labelAlign: String as PropType<CommonFieldProps['labelAlign']>,
+    labelWidth: [String, Number],
+    noLabel: Boolean,
+    noErrorMessage: Boolean,
+    name: String,
+    fieldClassName: String,
+    fieldStyle: Object,
+    initValue: PropTypes.any,
+    validate: PropTypes.node as PropType<CommonFieldProps['validate']>,
+    /** Check rules, check library based on async-validator */
+    rules: PropTypes.array,
+    /** Check trigger timing */
+    trigger: [PropTypes.string, PropTypes.array] as PropType<CommonFieldProps['trigger']>,
+    // onChange: (fieldValue: any) => void;
+    /** Converts form control values before validation */
+    transform: PropTypes.func as PropType<CommonFieldProps['transform']>,
+    /** Make a second change to the component's value before the UI update */
+    convert: PropTypes.func as PropType<CommonFieldProps['convert']>,
+    allowEmptyString: PropTypes.bool,
+    /** When true, use rules verification, after encountering the first rule that fails the test, the verification of subsequent rules will no longer be triggered */
+    stopValidateWithError: PropTypes.bool,
+    /* Custom prompt information is displayed in the same block as the verification information. When both have values, the verification information is displayed first */
+    helpText: PropTypes.node as PropType<CommonFieldProps['helpText']>,
+    /* Extra message, you can use this when you need an error message and the prompt text to appear at the same time, after helpText/errorMessage */
+    extraText: PropTypes.node as PropType<CommonFieldProps['extraText']>,
+    extraTextPosition: PropTypes.string as PropType<CommonFieldProps['extraTextPosition']>,
+    /** These declaration just hack for Subtract, not valid props in CommonFieldProps */
+    defaultValue: PropTypes.any,
+    /** Whether to take over only the data stream, when true, it will not automatically insert modules such as ErrorMessage, Label, extraText, etc. The style and DOM structure are consistent with the original component */
+    pure: PropTypes.bool,
+  };
+  const SemiField = defineComponent({
+    props: {
+      ...vueProps as CombineProps<CommonFieldProps & C>
+    },
+    name: 'Form' + Component.name,
     //@ts-ignore
-    (truthProps, { attrs: props }) => {
+    setup(truthProps, { attrs: props }) {
       const slots = useSlots();
       const { getProps, hasInProps } = useHasInProps();
 
@@ -94,8 +156,7 @@ function withField<
       try {
         if (arrayFieldState.value) {
           initVal =
-            arrayFieldState.value.shouldUseInitValue &&
-            typeof mergeProps(_getProps()).initValue !== 'undefined'
+            arrayFieldState.value.shouldUseInitValue && typeof mergeProps(_getProps()).initValue !== 'undefined'
               ? mergeProps(_getProps()).initValue
               : initValueInFormOpts;
         }
@@ -112,7 +173,7 @@ function withField<
 
       const isUnmounted = shallowRef(false);
       const rulesRef: Ref = ref(mergeProps(_getProps()).rules);
-      const validateRef: Ref = ref(truthProps.validate);
+      const validateRef: Ref = ref(( truthProps as CommonFieldProps & C).validate);
       const validatePromise = shallowRef<Promise<any> | null>(null);
 
       // notNotify is true means that the onChange of the Form does not need to be triggered
@@ -175,10 +236,7 @@ function withField<
       // Execute the validation rules specified by rules
       const _validateInternal = (val: any, callOpts: CallOpts) => {
         let latestRules = rulesRef.value || [];
-        const validator = generateValidatesFromRules(
-          mergeProps(_getProps()).field,
-          latestRules
-        );
+        const validator = generateValidatesFromRules(mergeProps(_getProps()).field, latestRules);
         const model = {
           [mergeProps(_getProps()).field]: val,
         };
@@ -444,10 +502,10 @@ function withField<
 
       // avoid hooks capture value, fixed issue 346
       watch(
-        [() => truthProps.rules, () => truthProps.validate],
+        [() => ( truthProps as CommonFieldProps & C).rules, () => ( truthProps as CommonFieldProps & C).validate],
         () => {
           rulesRef.value = mergeProps(_getProps()).rules;
-          validateRef.value = truthProps.validate;
+          validateRef.value = ( truthProps as CommonFieldProps & C).validate;
         },
         { immediate: true }
       );
@@ -470,6 +528,7 @@ function withField<
         let mergeTrigger = transformTrigger(trigger, formProps.trigger);
 
         const validateOnMount = mergeTrigger.includes('mount');
+        isUnmounted.value = false;
         if (validateOnMount) {
           fieldValidate(value);
         }
@@ -480,7 +539,7 @@ function withField<
       });
 
       watch(
-        () => truthProps.field,
+        () => ( truthProps as CommonFieldProps & C).field,
         (value, oldValue, onCleanup) => {
           let {
             // condition,
@@ -535,8 +594,8 @@ function withField<
       );
 
       return (_ctx, _cache) => {
-        const label = truthProps.label;
-        const id = truthProps.id;
+        const label = ( truthProps as CommonFieldProps & C).label;
+        const id = ( truthProps as CommonFieldProps & C).id;
         let {
           // condition,
           field,
@@ -571,7 +630,7 @@ function withField<
           rest: rest_,
         } = mergeProps(_getProps());
 
-        const rest = truthProps.prefix ? { ...rest_, prefix: truthProps.prefix } : rest_;
+        const rest = ( truthProps as CommonFieldProps & C).prefix ? { ...rest_, prefix: ( truthProps as CommonFieldProps & C).prefix } : rest_;
         let { options, shouldInject } = mergeOptions(opts, props);
 
         warning(
@@ -795,27 +854,9 @@ function withField<
         );
       };
     },
-    {
-      props: {
-        ...omit(
-          { ...(Component as unknown as DefineComponent).props, ...(vuePropsType || {}) } || {},
-          // 'style',
-          'class'
-        ),
-        label: [...PropTypes.node, PropTypes.func],
-        validate: [PropTypes.func],
-        id: [String],
-        rules: Array,
-        field: String,
-        className: String,
-        // modelValue: [String, Number, Object, Array],
-        // 'onUpdate:modelValue': Function
-      },
-      name: 'Form' + Component.name,
-    }
-  );
+  });
 
-  return SemiField as any;
+  return SemiField;
 }
 
 // eslint-disable-next-line

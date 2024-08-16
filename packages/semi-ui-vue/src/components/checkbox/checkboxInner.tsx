@@ -6,7 +6,7 @@ import { checkboxClasses as css } from '@douyinfe/semi-foundation/checkbox/const
 import { IconCheckboxTick, IconCheckboxIndeterminate } from '@kousum/semi-icons-vue';
 import { AriaAttributes } from '../AriaAttributes';
 import { symbol, vuePropsMake } from '../PropTypes';
-import { VueHTMLAttributes } from '../interface';
+import { CombineProps, VueHTMLAttributes } from '../interface';
 import { propTypesCheckbox } from './propType';
 import { ComponentObjectPropsOptions } from 'vue';
 
@@ -35,11 +35,11 @@ export interface CheckboxInnerProps {
   value?: any;
 }
 
-const propTypes: ComponentObjectPropsOptions<CheckboxInnerProps> = {
+const propTypes: CombineProps<CheckboxInnerProps> = {
   ...propTypesCheckbox,
   'aria-describedby': PropTypes.string,
   'aria-errormessage': PropTypes.string,
-  'aria-invalid': PropTypes.bool,
+  'aria-invalid': [PropTypes.bool, PropTypes.string] as PropType<CheckboxInnerProps['aria-invalid']>,
   'aria-labelledby': PropTypes.string,
   'aria-required': PropTypes.bool,
   checked: PropTypes.bool,
@@ -66,8 +66,10 @@ const defaultProps = {
   onChange: noop,
 };
 export const vuePropsType = vuePropsMake<CheckboxInnerProps>(propTypes, defaultProps);
-const CheckboxInner = defineComponent<CheckboxInnerProps>(
-  (props, { expose }) => {
+const CheckboxInner = defineComponent({
+  props: { ...vuePropsType },
+  name: 'vuePropsType',
+  setup(props, { expose }) {
     const slots = useSlots();
     const inputEntity = ref();
 
@@ -151,10 +153,6 @@ const CheckboxInner = defineComponent<CheckboxInnerProps>(
       );
     };
   },
-  {
-    props: vuePropsType,
-    name: 'vuePropsType',
-  }
-);
+});
 
 export default CheckboxInner;
