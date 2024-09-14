@@ -115,6 +115,34 @@ const navItem = [
     ],
   },
   {
+    itemKey: 'plus',
+    text: '基础',
+    textUs: 'Plus',
+    items: [
+      {
+        itemKey: '/plus/chat/',
+        text: 'Chat 对话',
+        icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('chat') })),
+      },
+      {
+        itemKey: '/plus/lottie/',
+        text: 'Lottie 动画',
+        icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('lottie') })),
+      },
+      {
+        itemKey: '/plus/codehighlight/',
+        text: 'Codehighlight 代码高亮',
+        icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('codehighlight') })),
+      },
+      {
+        itemKey: '/plus/markdownrender/',
+        text: 'Markdown 渲染',
+        icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('markdown') })),
+      },
+
+    ],
+  },
+  {
     itemKey: 'input',
     text: '输入类',
     textUs: 'Input',
@@ -141,6 +169,11 @@ const navItem = [
         icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('checkbox') })),
       },
       {
+        itemKey: '/input/colorPicker/',
+        text: 'ColorPicker 颜色选择器',
+        icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('colors') })),
+      },
+      {
         itemKey: '/input/datepicker/',
         text: 'DatePicker 日期选择器',
         icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('datepicker') })),
@@ -159,6 +192,11 @@ const navItem = [
         itemKey: '/input/inputnumber/',
         text: 'InputNumber 数字输入框',
         icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('inputnumber') })),
+      },
+      {
+        itemKey: '/input/pinCode/',
+        text: 'PinCode 验证码输入',
+        icon: h(Icon, {}, () => h(InlineSvg, { svg: getIcon('pincode') })),
       },
       {
         itemKey: '/input/radio/',
@@ -444,7 +482,7 @@ function gotoGithub() {
 }
 
 const { page, site, theme, isDark } = useData();
-
+console.log(theme.value);
 function navSelect(v) {
   // router.go((import.meta.env.BASE_URL + v.itemKey).replace('//', '/'));
 }
@@ -514,7 +552,7 @@ provide('hero-image-slot-exists', null);
 <!--    <VPContent v-if="page.filePath === 'index.md'" />-->
     <Layout className="in_body">
       <LayoutSider className="layout_sider">
-        <div class="layout_nav" style="height: calc(100vh - 60px); background-color: var(--semi-color-bg-0)">
+        <div class="layout_nav" style="height: calc(100vh - 60px); background-color: var(--semi-color-bg-0);">
           <Nav
             :defaultOpenKeys="navItem.map((item) => item.itemKey)"
             style="height: calc(100%); width: 280px"
@@ -544,6 +582,9 @@ provide('hero-image-slot-exists', null);
 </template>
 <style lang="scss">
 /* ++++ overview start ++++ */
+:root{
+  --vp-icon-copy:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' height='20' width='20' stroke='rgba(128,128,128,1)' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2'/%3E%3C/svg%3E")
+}
 .semi-overview-list {
   display: flex;
   flex-wrap: wrap;
@@ -714,6 +755,13 @@ img {
     }
   }
 }
+
+
+.aside-content{
+  .outline-link{
+    line-height: 24px;
+  }
+}
 </style>
 <style lang="scss" scoped>
 .header {
@@ -722,7 +770,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: #eee solid 1px;
+  border-bottom: var(--semi-color-border) solid 1px;
 }
 
 .layout_nav {
@@ -730,4 +778,9 @@ img {
   //  height: 100%!important;
   //}
 }
+
+
+
+
+
 </style>

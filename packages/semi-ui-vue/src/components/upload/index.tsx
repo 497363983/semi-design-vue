@@ -5,7 +5,7 @@ import { noop, pick } from 'lodash';
 import UploadFoundation from '@douyinfe/semi-foundation/upload/foundation';
 import { strings, cssClasses } from '@douyinfe/semi-foundation/upload/constants';
 import FileCard, { FileCardProps, vuePropsType as vuePropsTypeFileCard } from './fileCard';
-import { useBaseComponent } from '../_base/baseComponent';
+import { useBaseComponent, useHasInProps } from '../_base/baseComponent';
 import LocaleConsumer from '../locale/localeConsumer';
 import { IconUpload } from '@kousum/semi-icons-vue';
 import type {
@@ -254,6 +254,7 @@ const Upload = defineComponent({
   name: 'Upload',
   setup(props, { expose }) {
     const slots = useSlots();
+    const {getProps} = useHasInProps()
 
     const state = reactive<UploadState>({
       fileList: props.defaultFileList || [],
@@ -339,8 +340,8 @@ const Upload = defineComponent({
    *   which seems to be a bug, remove props type declare here
    */
     function getDerivedStateFromProps(props) {
-      const { fileList } = props;
-      if ('fileList' in props) {
+      const { fileList } = getProps(props);
+      if ('fileList' in getProps(props)) {
         return {
           fileList: fileList || [],
         };
@@ -350,7 +351,7 @@ const Upload = defineComponent({
     watch(
       () => props.fileList,
       (val) => {
-        if ('fileList' in props) {
+        if ('fileList' in getProps(props)) {
           state.fileList = val || [];
         }
       },

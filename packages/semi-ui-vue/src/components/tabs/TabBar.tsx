@@ -176,7 +176,7 @@ const TabBar = defineComponent({
       if (isEmpty(items)) {
         return (
           <div role="presentation" class={arrowCls}>
-            <Button disabled={true} icon={icon} theme="borderless" />
+            <Button disabled={true} icon={()=>icon} theme="borderless" />
           </div>
         );
       }
@@ -188,15 +188,15 @@ const TabBar = defineComponent({
         <DropdownMenu>
           {items.map((panel) => {
             const { icon: i, tab, itemKey } = panel;
-            const panelIcon = i ? renderIcon(panel.icon) : null;
+            const panelIcon = ()=>i ? renderIcon(panel.icon) : null;
             return (
               <DropdownItem
                 key={itemKey}
                 onClick={(e): void => handleItemClick(itemKey, e)}
                 active={_isActive(itemKey)}
               >
-                {panelIcon}
-                {tab}
+                {panelIcon()}
+                {typeof tab === 'function'?tab():tab}
               </DropdownItem>
             );
           })}
@@ -205,7 +205,7 @@ const TabBar = defineComponent({
 
       const button = (
         <div role="presentation" class={arrowCls} onClick={(e): void => handleArrowClick(items, pos)}>
-          <Button disabled={disabled} icon={icon} theme="borderless" />
+          <Button disabled={disabled} icon={()=>icon} theme="borderless" />
         </div>
       );
 
@@ -237,15 +237,16 @@ const TabBar = defineComponent({
       );
     };
 
-    const renderOverflow = (items: any[]): Array<VueJsxNode> =>
-      items.map((item, index) => {
+    const renderOverflow = (items: any[]): Array<VueJsxNode> => {
+      return items.map((item, index) => {
         const pos = index === 0 ? 'start' : 'end';
         if (props.renderArrow) {
           return props.renderArrow(item, pos, () => handleArrowClick(item, pos));
         }
         const icon = index === 0 ? <IconChevronLeft /> : <IconChevronRight />;
         return renderCollapse(item, icon, pos);
-      });
+      })
+    };
 
     const renderCollapsedTab = (): VueJsxNode => {
       const { list } = props;
@@ -259,6 +260,9 @@ const TabBar = defineComponent({
           overflowRenderDirection={props.arrowPosition}
           wrapperStyle={props.visibleTabsStyle}
           overflowRenderer={renderOverflow}
+          // threshold -> 比较intersectionRatio -> isIntersecting 如果是数组会按最小的那个值来比较。
+          // tabBar总宽度不能小于每一个tabBar的宽度*threshold，不然计算会出错。
+          threshold={0.5}
           renderMode="scroll"
           className={`${cssClasses.TABS_BAR}-overflow-list`}
           visibleItemRenderer={renderTabItem as any}

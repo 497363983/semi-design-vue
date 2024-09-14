@@ -1,81 +1,77 @@
 import * as PropTypes from '../PropTypes';
+import { vuePropsMake } from '../PropTypes';
 import classnames from 'classnames';
 import {
-  get,
-  noop,
-  includes,
+  debounce,
+  difference,
+  each,
   find,
   findIndex,
-  some,
-  debounce,
   flattenDeep,
-  each,
-  omit,
-  isNull,
-  difference,
+  get,
+  includes,
   isFunction,
   isObject,
   isPlainObject,
+  noop,
+  omit, pick,
+  some,
 } from 'lodash';
 
 import {
-  mergeQueries,
-  equalWith,
-  isAnyFixedRight,
   assignColumnKeys,
+  equalWith,
   flattenColumns,
   getAllDisabledRowKeys,
+  mergeQueries,
   shouldShowEllipsisTitle,
 } from '@douyinfe/semi-foundation/table/utils';
 import Store from '@douyinfe/semi-foundation/utils/Store';
 import TableFoundation, {
-  TableAdapter,
+  BaseHeadWidth,
   BasePageData,
   BaseRowKeyType,
-  BaseHeadWidth,
+  TableAdapter,
 } from '@douyinfe/semi-foundation/table/foundation';
 import { TableSelectionCellEvent } from '@douyinfe/semi-foundation/table/tableSelectionCellFoundation';
-import { strings, cssClasses, numbers } from '@douyinfe/semi-foundation/table/constants';
+import { cssClasses, numbers, strings } from '@douyinfe/semi-foundation/table/constants';
 import '@douyinfe/semi-foundation/table/table.scss';
 
 import Spin from '../spin';
 import LocaleConsumer from '../locale/localeConsumer';
 import getColumnsImport from './getColumns';
-import TableContext, { TableContextProps } from './table-context';
+import { TableContextProps } from './table-context';
 import TableContextProvider from './TableContextProvider';
-import ColumnSelection, { TableSelectionCellProps } from './ColumnSelection';
+import ColumnSelection from './ColumnSelection';
 import TablePagination from './TablePagination';
-import ColumnFilter, { OnSelectData } from './ColumnFilter';
+import ColumnFilter, { ColumnFilterVueProps, OnSelectData } from './ColumnFilter';
 import ColumnSorter from './ColumnSorter';
 import ExpandedIcon from './CustomExpandIcon';
 import HeadTable, { HeadTableProps } from './HeadTable';
 import BodyTable, { BodyProps } from './Body';
-import { measureScrollbar, logger, cloneDeep, mergeComponents, mergeColumns } from './utils';
+import { cloneDeep, logger, mergeColumns, mergeComponents } from './utils';
 import type {
-  ColumnProps,
-  TablePaginationProps,
   BodyScrollEvent,
   BodyScrollPosition,
-  ExpandIcon,
+  ColumnProps,
   ColumnTitleProps,
+  Data,
+  ExpandIcon,
   Pagination,
   RenderPagination,
-  TableLocale,
-  TableProps,
-  TableComponents,
   RowSelectionProps,
-  Data,
+  TableComponents,
+  TableLocale,
+  TablePaginationProps,
+  TableProps,
 } from './interface';
 import { ArrayElement } from '../_base/base';
 
 import { CombineProps, VueJsxNode } from '../interface';
 import {
-  ComponentInternalInstance,
-  ComponentObjectPropsOptions,
   CSSProperties,
   defineComponent,
   Fragment,
-  getCurrentInstance,
   h,
   isVNode,
   onBeforeUnmount,
@@ -87,7 +83,6 @@ import {
   useSlots,
   watch,
 } from 'vue';
-import { vuePropsMake } from '../PropTypes';
 import { useBaseComponent, useHasInProps } from '../_base/baseComponent';
 import { useTableContext } from './tableContext/Consumer';
 
@@ -185,6 +180,7 @@ const propTypes: CombineProps<NormalTableProps<any>> = {
   expandRowByClick: PropTypes.bool, // TODO: future api
   getVirtualizedListRef: PropTypes.func as PropType<NormalTableProps['getVirtualizedListRef']>, // TODO: future api
   bodyWrapperRef: [PropTypes.func, PropTypes.object],
+  sticky: [Boolean, Object],
   direction: PropTypes.string as PropType<NormalTableProps['direction']>,
 };
 export { propTypes as TablePropTypes };
@@ -1117,8 +1113,15 @@ function Table<RecordType extends Record<string, any>>() {
       const addFnsInColumn = (column: ColumnProps = {}) => {
         const { prefixCls } = props;
         if (column && (column.sorter || column.filters || column.onFilter || column.useFullRender)) {
+          let hasSorter = typeof column.sorter === 'function' || column.sorter === true;
+          let hasFilter = (Array.isArray(column.filters) && column.filters.length) ||
+            isVNode(column.filterDropdown) ||
+            typeof column.renderFilterDropdown === 'function';
           let hasSorterOrFilter = false;
+          const sortOrderNotControlled = !('sortOrder' in column);
+          const showSortTip = sortOrderNotControlled && column.showSortTip === true;
           const { dataIndex, title: rawTitle, useFullRender } = column;
+          const clickColumnToSorter = hasSorter && !hasFilter && !Boolean(useFullRender);
           const curQuery = foundation.getQuery(dataIndex);
           const titleMap: ColumnTitleProps = {};
           const titleArr = [];
@@ -1141,7 +1144,7 @@ function Table<RecordType extends Record<string, any>>() {
               {rawTitle}
             </span>
           );
-          if (typeof column.sorter === 'function' || column.sorter === true) {
+          if (hasSorter) {
             // In order to increase the click hot area of ​​sorting, when sorting is required & useFullRender is false,
             // both the title and sorting areas are used as the click hot area for sorting。
             const sorter = (
@@ -1149,8 +1152,9 @@ function Table<RecordType extends Record<string, any>>() {
                 key={strings.DEFAULT_KEY_COLUMN_SORTER}
                 sortOrder={sortOrder}
                 sortIcon={column.sortIcon}
-                onClick={(e) => foundation.handleSort(column, e)}
+                onClick={useFullRender || hasFilter ? e => foundation.handleSort(column, e) : null}
                 title={TitleNode}
+                showTooltip={!clickColumnToSorter && showSortTip}
               />
             );
             useFullRender && (titleMap.sorter = sorter);
@@ -1163,17 +1167,16 @@ function Table<RecordType extends Record<string, any>>() {
           const stateFilteredValue = get(curQuery, 'filteredValue');
           const defaultFilteredValue = get(curQuery, 'defaultFilteredValue');
           const filteredValue = stateFilteredValue ? stateFilteredValue : defaultFilteredValue;
-          if (
-            (Array.isArray(column.filters) && column.filters.length) ||
-            isVNode(column.filterDropdown) ||
-            typeof column.renderFilterDropdown === 'function'
-          ) {
+
+          if (hasFilter) {
             const filter = (
               <ColumnFilter
                 key={strings.DEFAULT_KEY_COLUMN_FILTER}
-                {...curQuery}
+                {...({
+                  ...pick(curQuery, ...Object.keys(ColumnFilterVueProps)),
+                  onFilterDropdownVisibleChange: (visible: boolean) => foundation.toggleShowFilter(dataIndex, visible)
+                })}
                 filteredValue={filteredValue}
-                onFilterDropdownVisibleChange={(visible: boolean) => foundation.toggleShowFilter(dataIndex, visible)}
                 onSelect={(data: OnSelectData) => {
                   foundation.handleFilterSelect(dataIndex, data);
                 }}
@@ -1193,6 +1196,13 @@ function Table<RecordType extends Record<string, any>>() {
               titleArr
             );
           column = { ...column, title: newTitle };
+          if (clickColumnToSorter) {
+            column.clickToSort = e => {
+              foundation.handleSort(column, e);
+            };
+            column.sortOrder = sortOrder;
+            column.showSortTip = showSortTip;
+          }
         }
 
         return column;
@@ -1338,7 +1348,6 @@ function Table<RecordType extends Record<string, any>>() {
         } = props_;
         const selectedRowKeysSet = get(rowSelection, 'selectedRowKeysSet', new Set());
         const tableLayout = adapter.getTableLayout();
-
         const headTable =
           fixed || useFixedHeader ? (
             <HeadTable
@@ -1502,7 +1511,6 @@ function Table<RecordType extends Record<string, any>>() {
           children,
           ...rest
         } = getProps(props);
-
         const wrapStyle: CSSProperties = {
           ...props.style,
         };

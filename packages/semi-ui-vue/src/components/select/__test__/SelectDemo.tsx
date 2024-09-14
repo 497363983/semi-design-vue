@@ -20,7 +20,7 @@ const SelectDemo = defineComponent((props, { slots }) => {
     { value: 'steve', label: 'Caption' },
     { value: 'peter', label: 'SpiderBoy' },
   ];
-  const optionListRef = ref<{ value: string; label: VNode | string }[]>([
+  const optionListRef = ref<{ value: string; label: VNode | string, [key: string]: any }[]>([
     { value: 'tony', label: 'Ironman' },
     { value: 'Thor', label: 'Thor' },
     { value: 'steve', label: 'Caption' },
@@ -141,7 +141,17 @@ const SelectDemo = defineComponent((props, { slots }) => {
     };
     function handleSearch() {}
 
-
+// return         <Form>
+//   <Form.Select
+//     field={'sdsd'}
+//     placeholder="onChange"
+//     style={{ width: '260px' }}
+//     filter
+//     optionList={optionListRef.value}
+//     onChangeWithObject={true}
+//     onChange={onChange}
+//   ></Form.Select>
+// </Form>
     return (
       <div>
         <Select

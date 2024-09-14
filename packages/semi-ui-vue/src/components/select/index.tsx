@@ -210,6 +210,7 @@ export type SelectProps = {
   preventScroll?: boolean;
   showRestTagsPopover?: boolean;
   restTagsPopoverProps?: PopoverProps;
+  isInInputGroup?: boolean;
 } & Pick<
   TooltipProps,
   | 'spacing'
@@ -341,7 +342,8 @@ const propTypes: CombineProps<SelectProps> = {
   searchPosition: String,
   searchPlaceholder: String,
   clearIcon: PropTypes.node,
-  dropdownMargin: [PropTypes.number, PropTypes.object,]
+  dropdownMargin: [PropTypes.number, PropTypes.object,],
+  isInInputGroup: Boolean,
 };
 
 const defaultProps: Partial<SelectProps> = {
@@ -1638,7 +1640,7 @@ const Index = defineComponent({
   },
 });
 
-export default defineComponent({
+const Select = defineComponent({
   props: { ...vuePropsType },
   name: 'Select',
   setup(props, {slots}){
@@ -1650,5 +1652,12 @@ export default defineComponent({
     }
   }
 });
-
+export type SelectType = typeof Select & {
+  Option: typeof Option
+  OptGroup: typeof OptionGroup
+}
+const baseSelect = Select as SelectType
+baseSelect.Option = Option
+baseSelect.OptGroup = OptionGroup
+export default baseSelect
 export { Option as SelectOption, OptionGroup as SelectOptionGroup };

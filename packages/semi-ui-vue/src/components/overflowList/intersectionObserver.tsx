@@ -7,7 +7,7 @@ import {
   onBeforeUnmount,
   onMounted,
   PropType,
-  useSlots,
+  useSlots, VNode,
   watch,
 } from 'vue';
 import { vuePropsMake } from '../PropTypes';
@@ -22,15 +22,17 @@ export interface ReactIntersectionObserverProps {
   threshold?: IntersectionObserverInit['threshold'];
   rootMargin?: IntersectionObserverInit['rootMargin'];
   items?: Record<string, Element>;
+  children?: ()=>(VNode[] | VNode)
 }
 
 const propTypes: CombineProps<ReactIntersectionObserverProps> = {
   onIntersect: PropTypes.func as PropType<ReactIntersectionObserverProps['onIntersect']>,
   option: PropTypes.object,
   root: PropTypes.any as PropType<ReactIntersectionObserverProps['root']>,
-  threshold: PropTypes.number,
+  threshold: [PropTypes.number, PropTypes.array],
   rootMargin: PropTypes.string,
   items: PropTypes.object,
+  children: PropTypes.func as PropType<ReactIntersectionObserverProps['children']>,
 };
 
 const defaultProps = {
@@ -49,27 +51,40 @@ const ReactIntersectionObserver = defineComponent({
     const slots = useSlots();
     let observer: IntersectionObserver;
     let cachedKeys: Array<string>;
-    onMounted(() => {
-      const { items } = props;
-      cachedKeys = Object.keys(items);
-      const { root, threshold, rootMargin, option, onIntersect } = props;
-      observer = new IntersectionObserver(onIntersect, {
-        root,
-        threshold,
-        rootMargin,
-        ...option,
-      });
-      observeElement();
-    });
+
+
+    watch(()=>props.root, (v)=>{
+      if(!observer && v){
+        const { items } = props;
+        cachedKeys = Object.keys(items);
+        const { root, threshold, rootMargin, option, onIntersect } = props;
+        observer = new IntersectionObserver(onIntersect, {
+          root,
+          threshold,
+          rootMargin,
+          ...option,
+        });
+        observeElement();
+      }
+    }, {immediate: true})
+
+
+
 
     watch(
-      () => Object.keys(props.items),
+      [
+        () => Object.keys(props.items),
+        () => props.children,
+        () => props.root,
+      ],
       () => {
-        const { items } = props;
-        const itemKeys = Object.keys(items);
-        if (!isEqual(cachedKeys, itemKeys)) {
-          observeElement(true);
-          cachedKeys = itemKeys;
+        if(observer){
+          const { items } = props;
+          const itemKeys = Object.keys(items);
+          if (!isEqual(cachedKeys, itemKeys)) {
+            observeElement(true);
+            cachedKeys = itemKeys;
+          }
         }
       }
     );
@@ -105,7 +120,7 @@ const ReactIntersectionObserver = defineComponent({
     }
 
     // 不能直接 return slots.default，会失去响应
-    return () => slots.default?.();
+    return () => props.children?.();
   },
 });
 

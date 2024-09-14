@@ -1,36 +1,33 @@
 import { PreviewContext } from './previewContext';
 import * as PropTypes from '../PropTypes';
-import { ImageProps, PreviewProps, PreviewState } from './interface';
+import { vuePropsMake } from '../PropTypes';
+import { PreviewProps, PreviewState } from './interface';
 import PreviewInner from './previewInner';
 import PreviewFoundation from '@douyinfe/semi-foundation/image/previewFoundation';
 import { getUuidShort } from '@douyinfe/semi-foundation/utils/uuid';
 import { cssClasses } from '@douyinfe/semi-foundation/image/constants';
-import { isObject, isEqual } from 'lodash';
+import { isEqual, isObject, omit } from 'lodash';
 import '@douyinfe/semi-foundation/image/image.scss';
 import {
+  cloneVNode,
   defineComponent,
   h,
-  reactive,
-  useSlots,
-  ref,
-  Fragment,
-  onMounted,
-  watch,
-  cloneVNode,
-  VNode,
   isVNode,
-  onBeforeUnmount,
-  ComponentObjectPropsOptions,
-  PropType,
-  shallowRef,
   nextTick,
+  onBeforeUnmount,
+  onMounted,
+  PropType,
+  reactive,
+  ref,
+  shallowRef,
+  useSlots,
+  VNode,
+  watch,
 } from 'vue';
-import { vuePropsMake } from '../PropTypes';
 import { useBaseComponent, useHasInProps } from '../_base/baseComponent';
 import { CombineProps, VueJsxNode } from '../interface';
-import { getFragmentChildren } from '../_utils';
+import { getChildren, getFragmentChildren, getVNodeChildren } from '../_utils';
 import cls from 'classnames';
-import { omit } from 'lodash';
 
 const prefixCls = cssClasses.PREFIX;
 
@@ -216,13 +213,13 @@ const Preview = defineComponent({
     };
 
     const loopImageIndex = () => {
-      const children = getFragmentChildren(slots);
+      const children = getFragmentChildren(slots) || [];
       let index = 0;
       const srcListInChildren = [];
       const titles: VueJsxNode = [];
-      const loop = (children: VNode[]) => {
-        return children.map((child) => {
-          if (child && child.props && child.type) {
+      const loop = (children_: VNode[]) => {
+        return children_.map((child) => {
+          if (child && child.type) {
             // @ts-ignore
             if (child.type.isSemiImage) {
               const { src, preview, alt } = child.props;
@@ -236,19 +233,17 @@ const Preview = defineComponent({
             }
           }
 
-          if (child && child.props && child.props.children) {
-            return cloneVNode(child, {
-              children: loop(child.props.children),
-            });
+          if (child && child.children) {
+            child.children = loop(getChildren(child.children as VNode[]))
+            return cloneVNode(child, {}, )
           }
 
           return child;
         });
       };
-
       return {
         srcListInChildren,
-        newChildren: loop(children),
+        newChildren: loop(getChildren(children)),
         titles,
       };
     };
@@ -286,12 +281,14 @@ const Preview = defineComponent({
             {newChildren}
           </div>
           <PreviewInner
-            {...previewInnerProps}
+            {...(handleVisibleChange?{
+              ...previewInnerProps,
+              onVisibleChange: handleVisibleChange
+            }:previewInnerProps)}
             ref={previewRef}
             src={finalSrcList}
             currentIndex={currentIndex}
             visible={visible}
-            onVisibleChange={handleVisibleChange}
           />
         </PreviewContext.Provider>
       );

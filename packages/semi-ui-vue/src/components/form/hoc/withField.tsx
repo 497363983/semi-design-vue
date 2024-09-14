@@ -101,7 +101,7 @@ function withField<
     fieldClassName: String,
     fieldStyle: Object,
     initValue: PropTypes.any,
-    validate: PropTypes.node as PropType<CommonFieldProps['validate']>,
+    validate: [...PropTypes.node, Function] as PropType<CommonFieldProps['validate']>,
     /** Check rules, check library based on async-validator */
     rules: PropTypes.array,
     /** Check trigger timing */
@@ -377,20 +377,15 @@ function withField<
        *
        */
       const handleChange = (newValue: any, e: any, ...other: any[]) => {
-        // 不明来源事件触发过滤
-        if (newValue && newValue[Symbol.toStringTag] && newValue[Symbol.toStringTag] === 'Event') {
-          console.trace('不明来源事件触发过滤', newValue);
-          return;
-        }
 
         let { trigger, emptyValue } = mergeProps(_getProps());
         let { allowEmptyString, allowEmpty } = mergeProps(_getProps());
         allowEmpty = getAllowEmpty(allowEmpty);
         let { options, shouldInject } = mergeOptions(opts, props);
         let fnKey = options.onKeyChangeFnName;
-        if (hasInProps(fnKey) && typeof props[options.onKeyChangeFnName] === 'function') {
+        if (hasInProps(fnKey) && typeof truthProps[options.onKeyChangeFnName] === 'function') {
           // @ts-ignore
-          props[options.onKeyChangeFnName](newValue, e, ...other);
+          truthProps[options.onKeyChangeFnName](newValue, e, ...other);
         }
 
         // support various type component
@@ -470,9 +465,10 @@ function withField<
         ]);
         let mergeTrigger = transformTrigger(trigger, formProps.trigger);
 
-        if (props.onBlur) {
+        // @ts-ignore
+        if (truthProps.onBlur) {
           // @ts-ignore
-          props.onBlur(e);
+          truthProps.onBlur(e);
         }
         if (!touched.value) {
           updateTouched(true);
@@ -587,11 +583,16 @@ function withField<
 
           // eslint-disable-next-line react-hooks/exhaustive-deps
           onCleanup(() => {
-            updater.value.unRegister(mergeProps(_getProps()).field);
+            const field = mergeProps(_getProps()).field
+            field && updater.value.unRegister(field);
           });
         },
         { immediate: true }
       );
+      // onBeforeUnmount(() => {
+      //   const field = mergeProps(_getProps()).field
+      //   field && updater.value.unRegister(field);
+      // });
 
       return (_ctx, _cache) => {
         const label = ( truthProps as CommonFieldProps & C).label;

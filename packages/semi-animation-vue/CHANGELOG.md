@@ -1,5 +1,17 @@
 # @kousum/semi-animation-vue
 
+## 0.20.0
+
+### Minor Changes
+
+- vue3.5.0 & fix
+
+## 0.19.0
+
+### Minor Changes
+
+- semi 2.65.0
+
 ## 0.18.0
 
 ### Minor Changes

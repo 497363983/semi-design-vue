@@ -264,11 +264,12 @@ export default defineConfig({
       },
     },
   },
+  ignoreDeadLinks: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
-      { text: '快速开始', link: '/start/getting-started/' },
+      { text: '快速开始', link: '/zh-CN/start/getting-started/' },
     ],
 
     sidebar: [
@@ -376,7 +377,7 @@ export default defineConfig({
             text: 'AutoComplete 自动完成',
           },
           {
-            link: '/input/button/',
+            link: '/zh-CN/input/button/',
             text: 'Button 按钮',
           },
           {
@@ -630,7 +631,7 @@ export default defineConfig({
       },
     ],
 
-    outline: { level: [1, 4] },
+    outline: { level: [1, 3] },
     socialLinks: [{ icon: 'github', link: 'https://github.com/rashagu/semi-design-vue' }],
   },
 });

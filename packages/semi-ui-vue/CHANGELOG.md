@@ -1,5 +1,43 @@
 # @kousum/semi-ui-vue
 
+## 0.20.0
+
+### Minor Changes
+
+- vue3.5.0 & fix
+
+### Patch Changes
+
+- Updated dependencies
+  - @kousum/semi-animation-vue@0.20.0
+  - @kousum/semi-icons-vue@0.20.0
+  - @kousum/semi-illustrations-vue@0.20.0
+
+## 0.19.0
+
+### Minor Changes
+
+- semi 2.65.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @kousum/semi-icons-vue@0.19.0
+  - @kousum/semi-animation-vue@0.19.0
+  - @kousum/semi-illustrations-vue@0.19.0
+
+## 0.18.2
+
+### Patch Changes
+
+- fix [Form] withField handleChange & useFieldState & [Tag] vue HTMLAttributes
+
+## 0.18.1
+
+### Patch Changes
+
+- fix Form.Select onChange
+
 ## 0.18.0
 
 ### Minor Changes

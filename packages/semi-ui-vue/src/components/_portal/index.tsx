@@ -100,7 +100,8 @@ const Index = defineComponent({
         }
       }
     );
-    onBeforeUnmount(() => {
+
+    onUnmounted(() => {
       if (state.container) {
         state.container.removeChild(el);
       }

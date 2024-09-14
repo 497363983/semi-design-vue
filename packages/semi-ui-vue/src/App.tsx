@@ -134,6 +134,29 @@ import ChatDemo from './components/chat/__test__/ChatDemo';
 import ToastUseDemo from './components/toast/__test__/ToastUseDemo';
 import SelectDemoToRawTest from './components/select/__test__/SelectDemoToRawTest';
 import ColorPickerDemo from './components/colorPicker/__test__/ColorPickerDemo';
+import FormLayoutDemo from './components/form/__test__/FormLayoutDemo.vue';
+import FormSlotDemo from './components/form/__test__/FormSlotDemo';
+import FormWinthFieldDemo4 from './components/form/__test__/FormWinthFieldDemo4';
+import SelectRenderOptionItem from './components/select/__test__/SelectRenderOptionItem';
+import UploadDemo3 from './components/upload/__test__/UploadDemo3';
+import UploadDemo4 from './components/upload/__test__/UploadDemo4';
+import NavDemo2 from './components/navigation/__test__/NavDemo2';
+import TabsDemo5 from './components/tabs/__test__/TabsDemo5';
+import TreeDemo3 from './components/tree/__test__/TreeDemo3';
+import TreeDemo4 from './components/tree/__test__/TreeDemo4';
+import TreeDemo5 from './components/tree/__test__/TreeDemo5';
+import ImageDemo2 from './components/image/__test__/ImageDemo2';
+import SideSheetDemo2 from './components/sideSheet/__test__/SideSheetDemo2';
+import TableColumnsFromChildren from './components/table/__test__/TableColumnsFromChildren';
+import TableDocsDemo from './components/table/__test__/TableDocsDemo';
+import TagDocsDemo from './components/tag/__test__/TagDocsDemo';
+import PopComfirmDocsDemo from './components/popconfirm/__test__/PopComfirmDocsDemo';
+import AvatarGroupDemo from './components/avatar/__test__/AvatarGroupDemo';
+import TabsDocsDemo from './components/tabs/__test__/TabsDocsDemo';
+import { Numeral } from './components/typography';
+import TabsDemoReact from './components/tabs/__test__/TabsDemoReact';
+import ModalDocsDemo from './components/modal/__test__/ModalDocsDemo';
+import SelectDocsDemo from './components/select/__test__/SelectDocsDemo';
 export interface ExampleProps {
   name?: string
 }
@@ -165,6 +188,9 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<HighlightDemo />*/}
         {/*<TimelineDemo/>*/}
         {/*<SideSheetDemo />*/}
+        {/*<SideSheetDemo2/>*/}
+        {/*<TableDocsDemo/>*/}
+        {/*<TableColumnsFromChildren/>*/}
         {/*<ListDemo />*/}
         {/*<DescriptionsDemo />*/}
         {/*<DescriptionsHorizontalDemo/>*/}
@@ -174,10 +200,13 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<StepsDemo />*/}
         {/*<BacktopDemo />*/}
         {/*<AnchorDemo />*/}
+        {/*<TabsDocsDemo/>*/}
+        {/*<TabsDemo5/>*/}
         {/*<TabsDemo />*/}
         {/*<TabsDemo3/>*/}
         {/*<TabsDemo4/>*/}
         {/*<TabsDemoVueSFC/>*/}
+        {/*<TabsDemoReact/>*/}
         {/*<CardDemo >*/}
         {/*  {a.value}*/}
         {/*</CardDemo>*/}
@@ -201,6 +230,7 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<TableDemo12 />*/}
         {/*<TableDemo13Virtualized />*/}
         {/*<PaginationDemo />*/}
+        {/*<PopComfirmDocsDemo/>*/}
         {/*<PopconfirmDemo/>*/}
         {/*<NotificationDemo/>*/}
         {/*<NotificationDemo2/>*/}
@@ -208,8 +238,12 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<BannerDemo/>*/}
         {/*<ToastDemo/>*/}
         {/*<ToastUseDemo/>*/}
+        {/*<ImageDemo2/>*/}
         {/*<ImageDemo/>*/}
         {/*<SkeletonDemo/>*/}
+        {/*<FormWinthFieldDemo4/>*/}
+        {/*<FormSlotDemo/>*/}
+        {/*<FormLayoutDemo/>*/}
         {/*<FormAllDemo />*/}
         {/*<FormDemo />*/}
         {/*<FormRenderDemo/>*/}
@@ -219,7 +253,11 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<WithFieldDemo2/>*/}
         {/*<TreeSelectDemo/>*/}
         {/*<TreeCheckDemo />*/}
+        {/*<TreeDemo />*/}
         {/*<TreeDemo2 />*/}
+        {/*<TreeDemo3/>*/}
+        {/*<TreeDemo4/>*/}
+        {/*<TreeDemo5/>*/}
         <div style={{backgroundColor: 'red', width: 300, height: 300}}>
 
         </div>
@@ -234,9 +272,12 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<ModalDemo/>*/}
         {/*<ModalDemoVueSFC/>*/}
         {/*<ModalDemo2/>*/}
+        {/*<ModalDocsDemo/>*/}
         {/*<LottieDemo/>*/}
         {/*<MarkDownRenderDemo/>*/}
         {/*<CodeHighlightDemo/>*/}
+        {/*<UploadDemo4/>*/}
+        {/*<UploadDemo3/>*/}
         {/*<UploadDemo/>*/}
         {/*<UpdateDemo2/>*/}
         {/*<ProgressDemo/>*/}
@@ -257,7 +298,10 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<DiyItemAutoComplete/>*/}
         {/*<RemoteAutoComplete/>*/}
         {/*<AutoCompleteSFC/>*/}
-        <ColorPickerDemo/>
+        {/*<ColorPickerDemo/>*/}
+
+        <SelectDocsDemo/>
+        {/*<SelectRenderOptionItem/>*/}
         {/*<SelectDemoToRawTest/>*/}
         {/*<SelectDemo/>*/}
         {/*<SelectDemo2/>*/}
@@ -265,16 +309,22 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<SelectDemo4/>*/}
         {/*<SelectDemo5/>*/}
         {/*<TagDemo/>*/}
+        {/*<TagDocsDemo/>*/}
         {/*<AvatarDemo/>*/}
+        {/*<AvatarGroupDemo/>*/}
         {/*<RadioDemo />*/}
 
         {/*<InputDemo />*/}
         {/*<TypeDemo />*/}
         {/*<TypoDemo3/>*/}
-
+        {/**/}
         {/*<TypoDemo2/>*/}
         {/*<TypoDemoSFC/>*/}
+        {/*<Numeral precision={1}>*/}
+        {/*  <p>点赞量：1.6111e1 K</p>*/}
+        {/*</Numeral>*/}
         {/*<NumeralDemo/>*/}
+
         {/*<TextDemo/>*/}
         {/*<LinkDemo/>*/}
         {/*<TypoCopyDemo/>*/}
@@ -298,6 +348,8 @@ const App = defineComponent<ExampleProps>((props, {slots}) => {
         {/*<SpaceTest/>*/}
         {/*<PopoverTest />*/}
         {/*<NavigationDemo />*/}
+        {/*<NavDemo2/>*/}
+
         {/*<ChatDemo/>*/}
         <div class={'aa'}>123</div>
       </ConfigProvider>
